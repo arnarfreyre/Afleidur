@@ -21,96 +21,8 @@
             </div>
         </div>
 
-        <div class="chapter-grid">
-            <!-- Forward Rate Calculator -->
-            <a href="Solvers/forward-rate-calculator.html" class="solver-card">
-                <h3>Forward Rate Calculator</h3>
-                <p>
-                    Calculate forward prices for various assets including stocks, commodities, and currencies. 
-                    Supports continuous and discrete dividend yields, storage costs, and convenience yields.
-                </p>
-                <span class="solver-status status-available">Available</span>
-            </a>
-
-            <!-- Black-Scholes Option Pricer -->
-            <div class="solver-card" style="opacity: 0.7; cursor: not-allowed;">
-                <h3>Black-Scholes Option Pricer</h3>
-                <p>
-                    Price European options using the Black-Scholes model. Calculate option values, 
-                    implied volatility, and all Greeks (Delta, Gamma, Theta, Vega, Rho).
-                </p>
-                <span class="solver-status status-coming-soon">Coming Soon</span>
-            </div>
-
-            <!-- Bond Price & Duration Calculator -->
-            <div class="solver-card" style="opacity: 0.7; cursor: not-allowed;">
-                <h3>Bond Price & Duration Calculator</h3>
-                <p>
-                    Calculate bond prices, yields to maturity, duration, and convexity. 
-                    Supports various day count conventions and compounding frequencies.
-                </p>
-                <span class="solver-status status-coming-soon">Coming Soon</span>
-            </div>
-
-            <!-- Binomial Option Model -->
-            <div class="solver-card" style="opacity: 0.7; cursor: not-allowed;">
-                <h3>Binomial Option Model</h3>
-                <p>
-                    Interactive binomial tree for pricing American and European options. 
-                    Visualize the option price evolution and early exercise decisions.
-                </p>
-                <span class="solver-status status-coming-soon">Coming Soon</span>
-            </div>
-
-            <!-- Interest Rate Swap Valuation -->
-            <div class="solver-card" style="opacity: 0.7; cursor: not-allowed;">
-                <h3>Interest Rate Swap Valuation</h3>
-                <p>
-                    Value plain vanilla and basis swaps. Calculate swap rates, 
-                    DV01, and perform scenario analysis with yield curve shifts.
-                </p>
-                <span class="solver-status status-coming-soon">Coming Soon</span>
-            </div>
-
-            <!-- Monte Carlo Simulator -->
-            <div class="solver-card" style="opacity: 0.7; cursor: not-allowed;">
-                <h3>Monte Carlo Simulator</h3>
-                <p>
-                    Simulate asset price paths for exotic option pricing. 
-                    Supports various stochastic processes including GBM, jump diffusion, and stochastic volatility.
-                </p>
-                <span class="solver-status status-coming-soon">Coming Soon</span>
-            </div>
-
-            <!-- Futures Margin Calculator -->
-            <div class="solver-card" style="opacity: 0.7; cursor: not-allowed;">
-                <h3>Futures Margin Calculator</h3>
-                <p>
-                    Calculate initial and maintenance margins for futures positions. 
-                    Simulate margin calls and analyze the impact of price movements.
-                </p>
-                <span class="solver-status status-coming-soon">Coming Soon</span>
-            </div>
-
-            <!-- Portfolio Greeks Calculator -->
-            <div class="solver-card" style="opacity: 0.7; cursor: not-allowed;">
-                <h3>Portfolio Greeks Calculator</h3>
-                <p>
-                    Aggregate Greeks for multi-asset option portfolios. 
-                    Perform risk analysis and hedging ratio calculations.
-                </p>
-                <span class="solver-status status-coming-soon">Coming Soon</span>
-            </div>
-
-            <!-- Volatility Surface Builder -->
-            <div class="solver-card" style="opacity: 0.7; cursor: not-allowed;">
-                <h3>Volatility Surface Builder</h3>
-                <p>
-                    Construct and visualize implied volatility surfaces from option prices. 
-                    Interpolate volatilities for any strike and maturity combination.
-                </p>
-                <span class="solver-status status-coming-soon">Coming Soon</span>
-            </div>
+        <div class="chapter-grid" id="solversContainer">
+            <!-- Solvers will be dynamically loaded here from config -->
         </div>
 
         <div style="margin-top: 4rem; padding-top: 2rem; border-top: 1px solid #ddd;">
@@ -127,22 +39,19 @@
         </div>
     </div>
 
+    <!-- Load configuration and render utilities -->
+    <script src="js/solvers-config.js"></script>
+    <script src="js/render-utils.js"></script>
+    
     <script>
-        // Add smooth fade-in animation when page loads
+        // Render solvers when page loads
         document.addEventListener('DOMContentLoaded', function() {
-            const cards = document.querySelectorAll('.solver-card');
-            cards.forEach((card, index) => {
-                setTimeout(() => {
-                    card.style.opacity = '0';
-                    card.style.transform = 'translateY(20px)';
-                    card.style.transition = 'all 0.5s ease';
-                    
-                    setTimeout(() => {
-                        card.style.opacity = card.hasAttribute('href') ? '1' : '0.7';
-                        card.style.transform = 'translateY(0)';
-                    }, 50);
-                }, index * 100);
-            });
+            // Render solvers from config
+            if (window.renderUtils && window.solversConfig) {
+                renderUtils.renderCards('solversContainer', solversConfig, 'solver');
+            } else {
+                console.error('Failed to load configuration or render utilities');
+            }
         });
     </script>
 </body>

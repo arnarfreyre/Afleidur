@@ -25,7 +25,7 @@ const config = {
     enableInteractiveCalculators: true, // Enable/disable calculators
     
     // Default view settings
-    defaultView: 'chapters', // 'chapters' or 'problemsets'
+    defaultView: 'Chapters', // 'chapters' or 'problemsets'
     animationSpeed: 300, // Milliseconds for animations
 };
 
@@ -45,8 +45,8 @@ const chapters = {
         name: 'Options Fundamentals',
         description: 'Introduction to options pricing and basic strategies',
         icon: '📈',
-        available: false,
-        htmlFile: null,
+        available: true,
+        htmlFile: "Chapter1.html",
         topics: ['Payoff structures', 'Put-call parity', 'Binomial models', 'Basic strategies']
     },
     'black-scholes': {
@@ -114,29 +114,6 @@ const chapters = {
     }
 };
 
-// Problem set categories
-const problemCategories = {
-    'weekly': {
-        name: 'Weekly Problem Sets',
-        icon: '📝',
-        description: 'Regular weekly assignments'
-    },
-    'midterm': {
-        name: 'Midterm Practice',
-        icon: '📚',
-        description: 'Practice problems for midterm exam'
-    },
-    'final': {
-        name: 'Final Exam Prep',
-        icon: '🎓',
-        description: 'Comprehensive final exam preparation'
-    },
-    'bonus': {
-        name: 'Bonus Challenges',
-        icon: '🏆',
-        description: 'Advanced optional problems'
-    }
-};
 
 // UI Text configuration
 const uiText = {
@@ -173,13 +150,6 @@ const uiText = {
     }
 };
 
-// Difficulty levels with colors
-const difficultyLevels = {
-    easy: { name: 'Easy', color: '#28a745', points: 10 },
-    medium: { name: 'Medium', color: '#ffc107', points: 20 },
-    hard: { name: 'Hard', color: '#fd7e14', points: 30 },
-    expert: { name: 'Expert', color: '#dc3545', points: 50 }
-};
 
 // Export configuration
 if (typeof module !== 'undefined' && module.exports) {

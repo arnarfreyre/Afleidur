@@ -21,96 +21,8 @@
             </div>
         </div>
 
-        <div class="chapter-grid">
-            <!-- Time Value of Money -->
-            <a href="formulas/time-value-money.html" class="chapter-card">
-                <h3>Time Value of Money</h3>
-                <p>
-                    Compound interest, present value, future value, annuities, and perpetuities. 
-                    Essential foundations for all financial calculations.
-                </p>
-                <span class="chapter-status status-available">Available</span>
-            </a>
-
-            <!-- Bond Pricing -->
-            <a href="formulas/bond-pricing.html" class="chapter-card">
-                <h3>Bond Pricing</h3>
-                <p>
-                    Bond valuation formulas, yield to maturity, clean vs dirty prices, 
-                    and term structure calculations.
-                </p>
-                <span class="chapter-status status-available">Available</span>
-            </a>
-
-            <!-- Duration Measures -->
-            <a href="formulas/duration-measures.html" class="chapter-card">
-                <h3>Duration & Convexity</h3>
-                <p>
-                    Macaulay duration, modified duration, effective duration, 
-                    convexity, and price sensitivity measures.
-                </p>
-                <span class="chapter-status status-available">Available</span>
-            </a>
-
-            <!-- Options Pricing -->
-            <a href="formulas/options-pricing.html" class="chapter-card">
-                <h3>Options Pricing</h3>
-                <p>
-                    Black-Scholes formulas, Greeks, put-call parity, 
-                    binomial models, and option strategies.
-                </p>
-                <span class="chapter-status status-available">Available</span>
-            </a>
-
-            <!-- Futures & Forwards -->
-            <a href="formulas/futures-forwards.html" class="chapter-card">
-                <h3>Futures & Forwards</h3>
-                <p>
-                    Forward pricing, cost of carry model, convenience yield, 
-                    and futures-spot parity relationships.
-                </p>
-                <span class="chapter-status status-available">Available</span>
-            </a>
-
-            <!-- Interest Rate Structures -->
-            <a href="formulas/interest-rates.html" class="chapter-card">
-                <h3>Interest Rate Structures</h3>
-                <p>
-                    Term structure interpolation, forward rates, yield curves, 
-                    bootstrapping, and swap rates.
-                </p>
-                <span class="chapter-status status-available">Available</span>
-            </a>
-
-            <!-- Swaps -->
-            <a href="formulas/swaps.html" class="chapter-card">
-                <h3>Swaps</h3>
-                <p>
-                    Interest rate swap valuation, swap rates, currency swaps, 
-                    and credit default swap formulas.
-                </p>
-                <span class="chapter-status status-available">Available</span>
-            </a>
-
-            <!-- Risk Metrics -->
-            <a href="formulas/risk-metrics.html" class="chapter-card">
-                <h3>Risk Metrics</h3>
-                <p>
-                    Value at Risk, Expected Shortfall, Expected Credit Loss, 
-                    and portfolio risk measures.
-                </p>
-                <span class="chapter-status status-available">Available</span>
-            </a>
-
-            <!-- Quick Reference -->
-            <a href="formulas/quick-reference.html" class="chapter-card">
-                <h3>Quick Reference</h3>
-                <p>
-                    Commonly used constants, conversions, compounding conventions, 
-                    and important mathematical relationships.
-                </p>
-                <span class="chapter-status status-available">Available</span>
-            </a>
+        <div class="chapter-grid" id="formulasContainer">
+            <!-- Formulas will be dynamically loaded here from config -->
         </div>
 
         <div style="margin-top: 4rem; padding-top: 2rem; border-top: 1px solid #ddd;">
@@ -127,20 +39,19 @@
         </div>
     </div>
 
+    <!-- Load configuration and render utilities -->
+    <script src="js/formulas-config.js"></script>
+    <script src="js/render-utils.js"></script>
+    
     <script>
-        // Add smooth fade-in animation when page loads
+        // Render formulas when page loads
         document.addEventListener('DOMContentLoaded', function() {
-            const cards = document.querySelectorAll('.chapter-card');
-            cards.forEach((card, index) => {
-                card.style.opacity = '0';
-                card.style.transform = 'translateY(20px)';
-                card.style.transition = 'all 0.5s ease';
-                
-                setTimeout(() => {
-                    card.style.opacity = '1';
-                    card.style.transform = 'translateY(0)';
-                }, index * 100);
-            });
+            // Render formulas from config
+            if (window.renderUtils && window.formulasConfig) {
+                renderUtils.renderCards('formulasContainer', formulasConfig, 'formula');
+            } else {
+                console.error('Failed to load configuration or render utilities');
+            }
         });
     </script>
 </body>
