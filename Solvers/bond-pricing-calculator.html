@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bond Pricing Calculator - Derivatives Course</title>
+    <link rel="stylesheet" href="../styles.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="main-header">
+            <h1>Bond Pricing Calculator</h1>
+            <p>Comprehensive bond valuation and risk analysis tool</p>
+            
+            <!-- Navigation tabs -->
+            <div class="nav-tabs">
+                <a href="../index.html" class="nav-tab">Study Materials</a>
+                <a href="../problem-sets.html" class="nav-tab">Problem Sets</a>
+                <a href="../solvers.html" class="nav-tab active">Solvers</a>
+                <a href="../formulas.html" class="nav-tab">Formulas</a>
+            </div>
+        </div>
+
+        <a href="../solvers.html" class="back-link">← Back to Solvers</a>
+
+        <div class="calculator-container">
+            <div class="calculator-grid">
+                <!-- Input Section -->
+                <div class="input-section">
+                    <h2>Bond Parameters</h2>
+                    
+                    <div class="input-group">
+                        <label for="nominal">
+                            Nominal/Face Value
+                            <span class="info-tooltip" data-tooltip="The amount paid to the bondholder at maturity">?</span>
+                        </label>
+                        <input type="number" id="nominal" value="1000" step="100" min="0">
+                    </div>
+
+                    <div class="input-group">
+                        <label for="currency">Currency</label>
+                        <select id="currency">
+                            <option value="USD">USD - US Dollar</option>
+                            <option value="EUR">EUR - Euro</option>
+                            <option value="GBP">GBP - British Pound</option>
+                            <option value="JPY">JPY - Japanese Yen</option>
+                            <option value="CHF">CHF - Swiss Franc</option>
+                            <option value="CAD">CAD - Canadian Dollar</option>
+                            <option value="AUD">AUD - Australian Dollar</option>
+                            <option value="ISK">ISK - Icelandic Króna</option>
+                        </select>
+                    </div>
+
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label for="issueDate">Issue Date</label>
+                            <input type="date" id="issueDate" value="2020-01-01">
+                        </div>
+                        <div class="input-group">
+                            <label for="maturityDate">Maturity Date</label>
+                            <input type="date" id="maturityDate" value="2030-01-01">
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="valuationDate">
+                            Valuation/Pricing Date
+                            <span class="info-tooltip" data-tooltip="The date on which you want to value the bond. For example, '3 months after issue' or 'today'">?</span>
+                        </label>
+                        <input type="date" id="valuationDate">
+                        <small>The date for which you're calculating the bond price</small>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="couponRate">
+                            Coupon Rate (% per annum)
+                            <span class="info-tooltip" data-tooltip="Annual coupon rate as a percentage of face value">?</span>
+                        </label>
+                        <input type="number" id="couponRate" value="4.375" step="0.125" min="0" max="100">
+                        <small>Annual coupon rate (e.g., 5 for 5%)</small>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="paymentFrequency">Payment Frequency</label>
+                        <select id="paymentFrequency">
+                            <option value="1">Annual</option>
+                            <option value="2" selected>Semi-Annual</option>
+                            <option value="4">Quarterly</option>
+                            <option value="12">Monthly</option>
+                        </select>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="yieldRate">
+                            Required Yield/Discount Rate (%)
+                            <span class="info-tooltip" data-tooltip="Market interest rate used to discount cash flows">?</span>
+                        </label>
+                        <input type="number" id="yieldRate" value="4" step="0.01" min="0" max="100">
+                        <small>Annual yield for pricing (e.g., 4 for 4%)</small>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="marketPrice">
+                            Current Market Price (Optional)
+                            <span class="info-tooltip" data-tooltip="Enter to calculate Yield to Maturity">?</span>
+                        </label>
+                        <input type="number" id="marketPrice" placeholder="Leave empty for theoretical price" step="0.01" min="0">
+                        <small>Used to calculate YTM</small>
+                    </div>
+
+                    <div class="toggle-section">
+                        <label>Callable Bond</label>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="callableToggle">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="callable-options" id="callableOptions">
+                        <div class="input-row">
+                            <div class="input-group">
+                                <label for="callDate">Call Date</label>
+                                <input type="date" id="callDate" value="2025-01-01">
+                            </div>
+                            <div class="input-group">
+                                <label for="callPrice">Call Price (%)</label>
+                                <input type="number" id="callPrice" value="102" step="0.1" min="0">
+                                <small>As % of face value</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button class="calculate-btn" onclick="calculateBond()">Calculate Bond Metrics</button>
+                </div>
+
+                <!-- Output Section -->
+                <div class="output-section">
+                    <h2>Valuation Results</h2>
+                    
+                    <div class="warning-message" id="warningMessage"></div>
+
+                    <div class="output-item">
+                        <div class="output-label">Clean Price</div>
+                        <div class="output-value highlight" id="cleanPrice">-</div>
+                    </div>
+
+                    <div class="output-item">
+                        <div class="output-label">Accrued Interest</div>
+                        <div class="output-value" id="accruedInterest">-</div>
+                    </div>
+
+                    <div class="output-item">
+                        <div class="output-label">Dirty Price (Full Price)</div>
+                        <div class="output-value" id="dirtyPrice">-</div>
+                    </div>
+
+                    <div class="output-item">
+                        <div class="output-label">Current Yield</div>
+                        <div class="output-value" id="currentYield">-</div>
+                    </div>
+
+                    <div class="output-item">
+                        <div class="output-label">Yield to Maturity (YTM)</div>
+                        <div class="output-value highlight" id="ytm">-</div>
+                    </div>
+
+                    <div class="output-item">
+                        <div class="output-label">Macaulay Duration</div>
+                        <div class="output-value" id="macaulayDuration">-</div>
+                    </div>
+
+                    <div class="output-item">
+                        <div class="output-label">Modified Duration</div>
+                        <div class="output-value" id="modifiedDuration">-</div>
+                    </div>
+
+                    <div class="output-item">
+                        <div class="output-label">Convexity</div>
+                        <div class="output-value" id="convexity">-</div>
+                    </div>
+
+                    <div class="output-item">
+                        <div class="output-label">Time to Maturity</div>
+                        <div class="output-value" id="timeToMaturity">-</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Summary Box -->
+            <div class="summary-box" id="summaryBox" style="display: none;">
+                <h3>Quick Summary</h3>
+                <div class="summary-grid">
+                    <div class="summary-item">
+                        <div class="summary-label">Total Return</div>
+                        <div class="summary-value" id="totalReturn">-</div>
+                    </div>
+                    <div class="summary-item">
+                        <div class="summary-label">Annual Income</div>
+                        <div class="summary-value" id="annualIncome">-</div>
+                    </div>
+                    <div class="summary-item">
+                        <div class="summary-label">Price Sensitivity</div>
+                        <div class="summary-value" id="priceSensitivity">-</div>
+                    </div>
+                    <div class="summary-item">
+                        <div class="summary-label">Premium/Discount</div>
+                        <div class="summary-value" id="premiumDiscount">-</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sensitivity Analysis -->
+            <div class="sensitivity-analysis" id="sensitivityAnalysis" style="display: none;">
+                <h3>Price Sensitivity Analysis</h3>
+                <p>Bond price changes for different yield scenarios:</p>
+                <table class="sensitivity-table">
+                    <thead>
+                        <tr>
+                            <th>Yield Change</th>
+                            <th>New Yield</th>
+                            <th>Bond Price</th>
+                            <th>Price Change</th>
+                            <th>% Change</th>
+                        </tr>
+                    </thead>
+                    <tbody id="sensitivityTableBody">
+                        <!-- Populated by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Cash Flow Schedule -->
+            <div class="cash-flow-section" id="cashFlowSection" style="display: none;">
+                <h3>Cash Flow Schedule</h3>
+                <div class="cash-flow-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Period</th>
+                                <th>Date</th>
+                                <th>Cash Flow</th>
+                                <th>Discount Factor</th>
+                                <th>Present Value</th>
+                            </tr>
+                        </thead>
+                        <tbody id="cashFlowTableBody">
+                            <!-- Populated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Formula Reference -->
+            <div class="formula-section">
+                <h3>Key Formulas</h3>
+                <div class="math">
+                    <p><strong>Bond Price:</strong></p>
+                    $$P = \sum_{t=1}^{n} \frac{C}{(1+r)^t} + \frac{FV}{(1+r)^n}$$
+                    
+                    <p><strong>Current Yield:</strong></p>
+                    $$CY = \frac{\text{Annual Coupon}}{\text{Current Price}}$$
+                    
+                    <p><strong>Macaulay Duration:</strong></p>
+                    $$D_{Mac} = \frac{\sum_{t=1}^{n} \frac{t \cdot CF_t}{(1+y)^t}}{P}$$
+                    
+                    <p><strong>Modified Duration:</strong></p>
+                    $$D_{Mod} = \frac{D_{Mac}}{1 + \frac{y}{m}}$$
+                    
+                    <p><strong>Convexity:</strong></p>
+                    $$C = \frac{1}{P} \sum_{t=1}^{n} \frac{t(t+1) \cdot CF_t}{(1+y)^{t+2}}$$
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize KaTeX
+        document.addEventListener("DOMContentLoaded", function() {
+            renderMathInElement(document.body, {
+                delimiters: [
+                    {left: '$$', right: '$$', display: true},
+                    {left: '$', right: '$', display: false}
+                ],
+                throwOnError: false
+            });
+
+            // Set default dates (example: bond issued Dec 6, 2018 with 10-year maturity)
+            const today = new Date();
+            const defaultIssueDate = new Date(2018, 11, 6);  // December 6, 2018
+            const defaultMaturityDate = new Date(2028, 11, 6);  // December 6, 2028
+            const defaultValuationDate = new Date(2019, 2, 6);  // March 6, 2019 (3 months after issue)
+            
+            document.getElementById('issueDate').value = defaultIssueDate.toISOString().split('T')[0];
+            document.getElementById('maturityDate').value = defaultMaturityDate.toISOString().split('T')[0];
+            // Set valuation date to today initially (user can change it)
+            document.getElementById('valuationDate').value = today.toISOString().split('T')[0];
+
+            // Toggle callable options
+            document.getElementById('callableToggle').addEventListener('change', function() {
+                const callableOptions = document.getElementById('callableOptions');
+                if (this.checked) {
+                    callableOptions.classList.add('show');
+                } else {
+                    callableOptions.classList.remove('show');
+                }
+            });
+
+            // Note: Auto-calculation removed - user must click Calculate button
+            // This ensures all inputs are properly filled before calculation
+        });
+
+        function calculateBond() {
+            // Clear previous results first
+            clearResults();
+            
+            // Validate required inputs first
+            if (!document.getElementById('nominal').value || 
+                !document.getElementById('couponRate').value || 
+                !document.getElementById('yieldRate').value ||
+                !document.getElementById('issueDate').value ||
+                !document.getElementById('maturityDate').value ||
+                !document.getElementById('valuationDate').value) {
+                showWarning("Please fill in all required fields: Nominal Value, Coupon Rate, Required Yield, Issue Date, Maturity Date, and Valuation Date");
+                return;
+            }
+
+            // Validate numeric inputs
+            const nominalInput = parseFloat(document.getElementById('nominal').value);
+            const couponRateInput = parseFloat(document.getElementById('couponRate').value);
+            const yieldRateInput = parseFloat(document.getElementById('yieldRate').value);
+            
+            if (isNaN(nominalInput) || nominalInput <= 0) {
+                showWarning("Nominal value must be a positive number");
+                return;
+            }
+            if (isNaN(couponRateInput) || couponRateInput < 0) {
+                showWarning("Coupon rate must be a non-negative number");
+                return;
+            }
+            if (isNaN(yieldRateInput) || yieldRateInput < 0) {
+                showWarning("Required yield must be a non-negative number");
+                return;
+            }
+
+            // Get input values
+            const nominal = parseFloat(document.getElementById('nominal').value);
+            const currency = document.getElementById('currency').value;
+            const issueDate = new Date(document.getElementById('issueDate').value);
+            const maturityDate = new Date(document.getElementById('maturityDate').value);
+            const valuationDate = new Date(document.getElementById('valuationDate').value);
+            const couponRate = parseFloat(document.getElementById('couponRate').value) / 100;
+            const paymentFrequency = parseFloat(document.getElementById('paymentFrequency').value) || 2;
+            const yieldRate = parseFloat(document.getElementById('yieldRate').value) / 100;
+            const marketPrice = parseFloat(document.getElementById('marketPrice').value) || null;
+            const isCallable = document.getElementById('callableToggle').checked;
+            const callDate = isCallable ? new Date(document.getElementById('callDate').value) : null;
+            const callPrice = isCallable ? parseFloat(document.getElementById('callPrice').value) / 100 : null;
+
+            // Calculate time metrics using valuation date
+            const yearsToMaturity = (maturityDate - valuationDate) / (365.25 * 24 * 60 * 60 * 1000);
+            const yearsSinceIssue = (valuationDate - issueDate) / (365.25 * 24 * 60 * 60 * 1000);
+
+            // Validate dates
+            if (isNaN(issueDate.getTime())) {
+                showWarning("Please enter a valid issue date");
+                return;
+            }
+            if (isNaN(maturityDate.getTime())) {
+                showWarning("Please enter a valid maturity date");
+                return;
+            }
+            if (isNaN(valuationDate.getTime())) {
+                showWarning("Please enter a valid valuation date");
+                return;
+            }
+            if (issueDate >= maturityDate) {
+                showWarning("Issue date must be before maturity date");
+                return;
+            }
+            if (valuationDate < issueDate) {
+                showWarning("Valuation date cannot be before issue date");
+                return;
+            }
+            if (valuationDate >= maturityDate) {
+                showWarning("Valuation date must be before maturity date");
+                return;
+            }
+            if (yearsToMaturity <= 0) {
+                showWarning("Bond has already matured");
+                return;
+            }
+
+            if (isCallable && callDate) {
+                const yearsToCall = (callDate - valuationDate) / (365.25 * 24 * 60 * 60 * 1000);
+                if (yearsToCall <= 0) {
+                    showWarning("Call date must be after valuation date");
+                    return;
+                }
+                if (callDate >= maturityDate) {
+                    showWarning("Call date must be before maturity date");
+                    return;
+                }
+            }
+
+            hideWarning();
+
+            // Calculate bond metrics
+            const couponPayment = (nominal * couponRate) / paymentFrequency;
+            const periods = Math.max(0, Math.floor(yearsToMaturity * paymentFrequency));
+            const periodYield = yieldRate / paymentFrequency;
+
+            // Calculate clean price using formula approach (matching Python implementation)
+            let cleanPrice = 0;
+            let macaulayDuration = 0;
+            let convexity = 0;
+            const cashFlows = [];
+
+            if (periods === 0) {
+                // Special case: less than one period to maturity
+                cleanPrice = nominal / Math.pow(1 + yieldRate, yearsToMaturity);
+                // Single cash flow at maturity
+                cashFlows.push({
+                    period: 0,
+                    date: maturityDate,
+                    cashFlow: nominal,
+                    discountFactor: Math.pow(1 + yieldRate, -yearsToMaturity),
+                    presentValue: cleanPrice
+                });
+                macaulayDuration = yearsToMaturity * cleanPrice;
+                convexity = yearsToMaturity * (yearsToMaturity + 1/paymentFrequency) * cleanPrice;
+            } else {
+                // Calculate present value of coupon payments
+                let pvCoupons = 0;
+                if (periodYield === 0) {
+                    // Special case: zero yield
+                    pvCoupons = couponPayment * periods;
+                } else {
+                    // Annuity formula for coupon payments
+                    pvCoupons = couponPayment * ((1 - Math.pow(1 + periodYield, -periods)) / periodYield);
+                }
+                
+                // Calculate present value of principal
+                const principalDiscountFactor = Math.pow(1 + periodYield, -periods);
+                const principalPV = nominal * principalDiscountFactor;
+                
+                // Total clean price
+                cleanPrice = pvCoupons + principalPV;
+                
+                // Calculate individual cash flows for display and duration calculation
+                for (let t = 1; t <= periods; t++) {
+                    const discountFactor = Math.pow(1 + periodYield, -t);
+                    const pv = couponPayment * discountFactor;
+                    macaulayDuration += t * pv;
+                    convexity += t * (t + 1) * pv;
+
+                    // Store cash flow data
+                    const periodDate = new Date(valuationDate);
+                    periodDate.setMonth(periodDate.getMonth() + (t * 12 / paymentFrequency));
+                    cashFlows.push({
+                        period: t,
+                        date: periodDate,
+                        cashFlow: couponPayment,
+                        discountFactor: discountFactor,
+                        presentValue: pv
+                    });
+                }
+                
+                // Add principal to duration calculations
+                macaulayDuration += periods * principalPV;
+                convexity += periods * (periods + 1) * principalPV;
+                
+                // Add principal to final cash flow
+                if (cashFlows.length > 0) {
+                    cashFlows[cashFlows.length - 1].cashFlow += nominal;
+                    cashFlows[cashFlows.length - 1].presentValue += principalPV;
+                }
+            }
+
+            // Calculate accrued interest
+            // Find the last coupon payment date
+            const daysInCouponPeriod = 365.25 / paymentFrequency;
+            const totalDaysSinceIssue = (valuationDate - issueDate) / (24 * 60 * 60 * 1000);
+            
+            let accruedInterest = 0;
+            if (totalDaysSinceIssue > 0) {
+                const periodsSinceIssue = Math.floor(totalDaysSinceIssue / daysInCouponPeriod);
+                const lastCouponDate = new Date(issueDate.getTime() + periodsSinceIssue * daysInCouponPeriod * 24 * 60 * 60 * 1000);
+                const daysSinceLastCoupon = (valuationDate - lastCouponDate) / (24 * 60 * 60 * 1000);
+                accruedInterest = couponPayment * (daysSinceLastCoupon / daysInCouponPeriod);
+                // Ensure accrued interest is not negative
+                accruedInterest = Math.max(0, accruedInterest);
+            }
+
+            // Calculate dirty price
+            const dirtyPrice = cleanPrice + accruedInterest;
+
+            // Calculate duration metrics
+            let modifiedDuration = 0;
+            if (cleanPrice > 0) {
+                macaulayDuration = macaulayDuration / cleanPrice / paymentFrequency;
+                modifiedDuration = macaulayDuration / (1 + yieldRate / paymentFrequency);
+                convexity = convexity / (cleanPrice * Math.pow(1 + periodYield, 2)) / Math.pow(paymentFrequency, 2);
+            } else {
+                // Handle edge case where clean price is 0 or very small
+                macaulayDuration = 0;
+                modifiedDuration = 0;
+                convexity = 0;
+            }
+
+            // Calculate current yield
+            const currentYield = cleanPrice > 0 ? (nominal * couponRate) / cleanPrice : 0;
+
+            // Calculate YTM if market price is provided
+            let ytm = yieldRate;
+            if (marketPrice) {
+                ytm = calculateYTM(marketPrice, nominal, couponRate, paymentFrequency, yearsToMaturity);
+            }
+
+            // Calculate yield to call if callable
+            let ytc = null;
+            if (isCallable && callDate && callPrice) {
+                const yearsToCall = (callDate - valuationDate) / (365.25 * 24 * 60 * 60 * 1000);
+                ytc = calculateYTM(cleanPrice, nominal * callPrice, couponRate, paymentFrequency, yearsToCall);
+                // Note: YTC can be displayed in future updates if needed
+            }
+
+            // Update output displays
+            updateOutput('cleanPrice', formatCurrency(cleanPrice, currency));
+            updateOutput('accruedInterest', formatCurrency(accruedInterest, currency));
+            updateOutput('dirtyPrice', formatCurrency(dirtyPrice, currency));
+            updateOutput('currentYield', formatPercent(currentYield));
+            updateOutput('ytm', formatPercent(ytm));
+            updateOutput('macaulayDuration', macaulayDuration.toFixed(2) + ' years');
+            updateOutput('modifiedDuration', modifiedDuration.toFixed(2));
+            updateOutput('convexity', convexity.toFixed(2));
+            updateOutput('timeToMaturity', yearsToMaturity.toFixed(2) + ' years (' + yearsSinceIssue.toFixed(2) + ' years since issue)');
+
+            // Update summary box
+            updateSummary(nominal, cleanPrice, couponRate, currentYield, currency);
+
+            // Perform sensitivity analysis
+            performSensitivityAnalysis(nominal, couponRate, paymentFrequency, yearsToMaturity, yieldRate, cleanPrice, currency);
+
+            // Display cash flows
+            displayCashFlows(cashFlows, currency);
+
+            // Show additional sections
+            document.getElementById('summaryBox').style.display = 'block';
+            document.getElementById('sensitivityAnalysis').style.display = 'block';
+            document.getElementById('cashFlowSection').style.display = 'block';
+        }
+
+        function calculateYTM(price, faceValue, couponRate, frequency, years) {
+            // Newton-Raphson method to find YTM
+            const periods = Math.floor(years * frequency);
+            const couponPayment = (faceValue * couponRate) / frequency;
+            let ytm = couponRate; // Initial guess
+            const tolerance = 0.00001;
+            const maxIterations = 100;
+
+            for (let i = 0; i < maxIterations; i++) {
+                let pv = 0;
+                let dpv = 0;
+
+                for (let t = 1; t <= periods; t++) {
+                    const df = Math.pow(1 + ytm / frequency, -t);
+                    pv += couponPayment * df;
+                    dpv -= t * couponPayment * df / (1 + ytm / frequency) / frequency;
+                }
+
+                const finalDF = Math.pow(1 + ytm / frequency, -periods);
+                pv += faceValue * finalDF;
+                dpv -= periods * faceValue * finalDF / (1 + ytm / frequency) / frequency;
+
+                const diff = pv - price;
+                if (Math.abs(diff) < tolerance) {
+                    break;
+                }
+
+                ytm = ytm - diff / dpv;
+            }
+
+            return ytm;
+        }
+
+        function performSensitivityAnalysis(nominal, couponRate, frequency, years, currentYield, basePrice, currency) {
+            const tbody = document.getElementById('sensitivityTableBody');
+            tbody.innerHTML = '';
+
+            const yieldChanges = [-2, -1, -0.5, -0.25, 0, 0.25, 0.5, 1, 2];
+
+            yieldChanges.forEach(change => {
+                const newYield = currentYield + (change / 100);
+                const newPrice = calculateBondPrice(nominal, couponRate, frequency, years, newYield);
+                const priceChange = newPrice - basePrice;
+                const percentChange = (priceChange / basePrice) * 100;
+
+                const row = tbody.insertRow();
+                row.insertCell(0).textContent = (change >= 0 ? '+' : '') + change + '%';
+                row.insertCell(1).textContent = formatPercent(newYield);
+                row.insertCell(2).textContent = formatCurrency(newPrice, currency);
+                row.insertCell(3).textContent = formatCurrency(priceChange, currency);
+                row.insertCell(4).textContent = percentChange.toFixed(2) + '%';
+
+                if (change === 0) {
+                    row.style.background = '#e8f4f8';
+                    row.style.fontWeight = 'bold';
+                }
+            });
+        }
+
+        function calculateBondPrice(nominal, couponRate, frequency, years, yieldRate) {
+            // Using the closed-form formula for efficiency (matching Python implementation)
+            const periods = Math.floor(years * frequency);
+            const couponPayment = (nominal * couponRate) / frequency;
+            const periodYield = yieldRate / frequency;
+            
+            if (periods === 0) {
+                // If maturity is less than one period away, just discount the face value
+                return nominal / Math.pow(1 + yieldRate, years);
+            }
+            
+            let price = 0;
+            
+            if (periodYield === 0) {
+                // Special case: zero yield
+                price = couponPayment * periods + nominal;
+            } else {
+                // Present value of coupon payments (annuity formula)
+                const pvCoupons = couponPayment * ((1 - Math.pow(1 + periodYield, -periods)) / periodYield);
+                
+                // Present value of face value
+                const pvFaceValue = nominal * Math.pow(1 + periodYield, -periods);
+                
+                // Total bond price
+                price = pvCoupons + pvFaceValue;
+            }
+            
+            return price;
+        }
+
+        function displayCashFlows(cashFlows, currency) {
+            const tbody = document.getElementById('cashFlowTableBody');
+            tbody.innerHTML = '';
+
+            let totalPV = 0;
+            cashFlows.forEach(cf => {
+                const row = tbody.insertRow();
+                row.insertCell(0).textContent = cf.period;
+                row.insertCell(1).textContent = cf.date.toLocaleDateString();
+                row.insertCell(2).textContent = formatCurrency(cf.cashFlow, currency);
+                row.insertCell(3).textContent = cf.discountFactor.toFixed(6);
+                row.insertCell(4).textContent = formatCurrency(cf.presentValue, currency);
+                totalPV += cf.presentValue;
+            });
+
+            // Add total row
+            const totalRow = tbody.insertRow();
+            totalRow.style.fontWeight = 'bold';
+            totalRow.style.background = '#f0f0f0';
+            totalRow.insertCell(0).textContent = 'Total';
+            totalRow.insertCell(1).textContent = '';
+            totalRow.insertCell(2).textContent = '';
+            totalRow.insertCell(3).textContent = '';
+            totalRow.insertCell(4).textContent = formatCurrency(totalPV, currency);
+        }
+
+        function updateSummary(nominal, price, couponRate, currentYield, currency) {
+            const totalReturn = ((nominal - price) / price) * 100;
+            const annualIncome = nominal * couponRate;
+            const priceSensitivity = price > nominal ? 'Premium' : price < nominal ? 'Discount' : 'Par';
+            const premiumDiscount = ((price - nominal) / nominal) * 100;
+
+            updateOutput('totalReturn', totalReturn.toFixed(2) + '%');
+            updateOutput('annualIncome', formatCurrency(annualIncome, currency));
+            updateOutput('priceSensitivity', priceSensitivity);
+            updateOutput('premiumDiscount', premiumDiscount.toFixed(2) + '%');
+        }
+
+        function formatCurrency(value, currency) {
+            const symbols = {
+                'USD': '$',
+                'EUR': '€',
+                'GBP': '£',
+                'JPY': '¥',
+                'CHF': 'CHF ',
+                'CAD': 'C$',
+                'AUD': 'A$',
+                'ISK': 'ISK '
+            };
+            const symbol = symbols[currency] || currency + ' ';
+            return symbol + value.toFixed(2);
+        }
+
+        function formatPercent(value) {
+            return (value * 100).toFixed(3) + '%';
+        }
+
+        function updateOutput(id, value) {
+            document.getElementById(id).textContent = value;
+        }
+
+        function showWarning(message) {
+            const warningElement = document.getElementById('warningMessage');
+            warningElement.textContent = message;
+            warningElement.classList.add('show');
+        }
+
+        function hideWarning() {
+            document.getElementById('warningMessage').classList.remove('show');
+        }
+
+        function clearResults() {
+            // Clear all output fields
+            const outputIds = ['cleanPrice', 'accruedInterest', 'dirtyPrice', 'currentYield', 
+                             'ytm', 'macaulayDuration', 'modifiedDuration', 'convexity', 
+                             'timeToMaturity', 'totalReturn', 'annualIncome', 'priceSensitivity', 
+                             'premiumDiscount'];
+            outputIds.forEach(id => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.textContent = '-';
+                }
+            });
+            
+            // Hide additional sections
+            document.getElementById('summaryBox').style.display = 'none';
+            document.getElementById('sensitivityAnalysis').style.display = 'none';
+            document.getElementById('cashFlowSection').style.display = 'none';
+            
+            // Clear tables
+            document.getElementById('sensitivityTableBody').innerHTML = '';
+            document.getElementById('cashFlowTableBody').innerHTML = '';
+        }
+    </script>
+</body>
+</html>
