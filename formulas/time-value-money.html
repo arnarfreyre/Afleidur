@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Time Value of Money - Formula Sheet</title>
+    <link rel="stylesheet" href="../styles.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" 
+            onload="renderMathInElement(document.body, {
+                delimiters: [
+                    {left: '$$', right: '$$', display: true},
+                    {left: '$', right: '$', display: false}
+                ],
+                throwOnError: false
+            });"></script>
+</head>
+<body>
+    <a href="../formulas.html" class="back-to-main">← Back to Formulas</a>
+    
+    <div class="container">
+        <div class="formula-page-header">
+            <h1>Time Value of Money</h1>
+            <p class="formula-subtitle">Fundamental formulas for financial calculations</p>
+        </div>
+
+        <div class="formula-section">
+            <h2>Compound Interest (Discrete)</h2>
+            <div class="formula-box">
+                <div class="math">
+                    $$FV = PV \times (1 + r)^n$$
+                </div>
+                <div class="formula-variables">
+                    <h4>Variables:</h4>
+                    <ul>
+                        <li><strong>$FV$</strong> = Future Value</li>
+                        <li><strong>$PV$</strong> = Present Value</li>
+                        <li><strong>$r$</strong> = Interest rate per period</li>
+                        <li><strong>$n$</strong> = Number of periods</li>
+                    </ul>
+                </div>
+                <div class="formula-note">
+                    <strong>Note:</strong> For finding periods: $n = \frac{\ln(FV/PV)}{\ln(1+r)}$
+                </div>
+            </div>
+        </div>
+
+        <div class="formula-section">
+            <h2>Present Value of Single Cash Flow</h2>
+            <div class="formula-box">
+                <div class="math">
+                    $$PV = \frac{CF}{(1 + r)^t}$$
+                </div>
+                <div class="formula-variables">
+                    <h4>Variables:</h4>
+                    <ul>
+                        <li><strong>$CF$</strong> = Cash flow at time $t$</li>
+                        <li><strong>$r$</strong> = Discount rate</li>
+                        <li><strong>$t$</strong> = Time period</li>
+                    </ul>
+                </div>
+                <div class="formula-note">
+                    <strong>Usage:</strong> Discounting future cash flows to present value
+                </div>
+            </div>
+        </div>
+
+        <div class="formula-section">
+            <h2>Annuity Present Value</h2>
+            <div class="formula-box">
+                <div class="math">
+                    $$PV = C \times \frac{1 - (1 + r)^{-n}}{r}$$
+                </div>
+                <div class="formula-variables">
+                    <h4>Variables:</h4>
+                    <ul>
+                        <li><strong>$C$</strong> = Regular payment amount</li>
+                        <li><strong>$r$</strong> = Interest rate per period</li>
+                        <li><strong>$n$</strong> = Number of payments</li>
+                    </ul>
+                </div>
+                <div class="formula-note">
+                    <strong>Application:</strong> Used for bonds with regular coupon payments
+                </div>
+            </div>
+        </div>
+
+        <div class="formula-section">
+            <h2>Annuity Future Value</h2>
+            <div class="formula-box">
+                <div class="math">
+                    $$FV = C \times \frac{(1 + r)^n - 1}{r}$$
+                </div>
+                <div class="formula-variables">
+                    <h4>Variables:</h4>
+                    <ul>
+                        <li><strong>$C$</strong> = Regular payment amount</li>
+                        <li><strong>$r$</strong> = Interest rate per period</li>
+                        <li><strong>$n$</strong> = Number of payments</li>
+                    </ul>
+                </div>
+                <div class="formula-note">
+                    <strong>Usage:</strong> Calculate future value of regular investments
+                </div>
+            </div>
+        </div>
+
+        <div class="formula-section">
+            <h2>Perpetuity Present Value</h2>
+            <div class="formula-box">
+                <div class="math">
+                    $$PV = \frac{C}{r}$$
+                </div>
+                <div class="formula-variables">
+                    <h4>Variables:</h4>
+                    <ul>
+                        <li><strong>$C$</strong> = Constant payment amount</li>
+                        <li><strong>$r$</strong> = Interest rate per period</li>
+                    </ul>
+                </div>
+                <div class="formula-note">
+                    <strong>Note:</strong> Assumes payments continue forever
+                </div>
+            </div>
+        </div>
+
+        <div class="formula-section">
+            <h2>Growing Perpetuity</h2>
+            <div class="formula-box">
+                <div class="math">
+                    $$PV = \frac{C}{r - g}$$
+                </div>
+                <div class="formula-variables">
+                    <h4>Variables:</h4>
+                    <ul>
+                        <li><strong>$C$</strong> = Initial payment amount</li>
+                        <li><strong>$r$</strong> = Discount rate</li>
+                        <li><strong>$g$</strong> = Growth rate (must be less than $r$)</li>
+                    </ul>
+                </div>
+                <div class="formula-note">
+                    <strong>Application:</strong> Gordon Growth Model for stock valuation
+                </div>
+            </div>
+        </div>
+
+        <div class="formula-section">
+            <h2>Continuous Compounding</h2>
+            <div class="formula-box">
+                <div class="math">
+                    $$FV = PV \times e^{rt}$$
+                </div>
+                <div class="formula-variables">
+                    <h4>Variables:</h4>
+                    <ul>
+                        <li><strong>$e$</strong> = Euler's number (≈ 2.71828)</li>
+                        <li><strong>$r$</strong> = Annual interest rate</li>
+                        <li><strong>$t$</strong> = Time in years</li>
+                    </ul>
+                </div>
+                <div class="formula-note">
+                    <strong>Usage:</strong> Common in derivatives pricing models
+                </div>
+            </div>
+        </div>
+
+        <div class="formula-footer">
+            <p>All formulas verified using Python calculations</p>
+            <p><a href="../formulas.html">← Return to Formula Sheets</a></p>
+        </div>
+    </div>
+
+    <style>
+        .formula-page-header {
+            text-align: center;
+            padding: 2rem 0;
+            border-bottom: 3px solid #e74c3c;
+            margin-bottom: 3rem;
+        }
+
+        .formula-page-header h1 {
+            font-size: 2.5em;
+            color: #1a1a1a;
+            margin-bottom: 0.5rem;
+        }
+
+        .formula-subtitle {
+            font-size: 1.2em;
+            color: #666;
+            font-style: italic;
+        }
+
+        .formula-section {
+            margin-bottom: 3rem;
+        }
+
+        .formula-section h2 {
+            color: #e74c3c;
+            font-size: 1.8em;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #e74c3c;
+        }
+
+        .formula-box {
+            background: white;
+            border-radius: 8px;
+            padding: 2rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+
+        .formula-box .math {
+            background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+            border-left: 4px solid #e74c3c;
+            border-radius: 4px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            text-align: center;
+            font-size: 1.3em;
+        }
+
+        .formula-variables {
+            margin: 1.5rem 0;
+        }
+
+        .formula-variables h4 {
+            color: #2c5282;
+            font-size: 1.2em;
+            margin-bottom: 0.8rem;
+        }
+
+        .formula-variables ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .formula-variables li {
+            padding: 0.5rem 0;
+            padding-left: 1.5rem;
+            position: relative;
+            color: #4a5568;
+            font-size: 1.05em;
+        }
+
+        .formula-variables li:before {
+            content: "▸";
+            position: absolute;
+            left: 0;
+            color: #e74c3c;
+            font-weight: bold;
+        }
+
+        .formula-note {
+            background: #e3f2fd;
+            color: #1565c0;
+            padding: 1rem;
+            border-radius: 4px;
+            margin-top: 1rem;
+            border-left: 3px solid #1976d2;
+        }
+
+        .formula-footer {
+            text-align: center;
+            padding: 2rem;
+            margin-top: 4rem;
+            border-top: 2px solid #e74c3c;
+            color: #666;
+        }
+
+        .formula-footer a {
+            color: #e74c3c;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .formula-footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</body>
+</html>

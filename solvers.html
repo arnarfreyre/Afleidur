@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solvers - Derivatives Course</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <div class="main-header">
+            <h1>Derivatives: Financial Engineering</h1>
+            <p>Interactive Calculators and Solvers</p>
+            
+            <!-- Navigation tabs -->
+            <div class="nav-tabs">
+                <a href="index.html" class="nav-tab">Study Materials</a>
+                <a href="problem-sets.html" class="nav-tab">Problem Sets</a>
+                <a href="solvers.html" class="nav-tab active">Solvers</a>
+                <a href="formulas.html" class="nav-tab">Formulas</a>
+            </div>
+        </div>
+
+        <div class="chapter-grid">
+            <!-- Forward Rate Calculator -->
+            <a href="Solvers/forward-rate-calculator.html" class="solver-card">
+                <h3>Forward Rate Calculator</h3>
+                <p>
+                    Calculate forward prices for various assets including stocks, commodities, and currencies. 
+                    Supports continuous and discrete dividend yields, storage costs, and convenience yields.
+                </p>
+                <span class="solver-status status-available">Available</span>
+            </a>
+
+            <!-- Black-Scholes Option Pricer -->
+            <div class="solver-card" style="opacity: 0.7; cursor: not-allowed;">
+                <h3>Black-Scholes Option Pricer</h3>
+                <p>
+                    Price European options using the Black-Scholes model. Calculate option values, 
+                    implied volatility, and all Greeks (Delta, Gamma, Theta, Vega, Rho).
+                </p>
+                <span class="solver-status status-coming-soon">Coming Soon</span>
+            </div>
+
+            <!-- Bond Price & Duration Calculator -->
+            <div class="solver-card" style="opacity: 0.7; cursor: not-allowed;">
+                <h3>Bond Price & Duration Calculator</h3>
+                <p>
+                    Calculate bond prices, yields to maturity, duration, and convexity. 
+                    Supports various day count conventions and compounding frequencies.
+                </p>
+                <span class="solver-status status-coming-soon">Coming Soon</span>
+            </div>
+
+            <!-- Binomial Option Model -->
+            <div class="solver-card" style="opacity: 0.7; cursor: not-allowed;">
+                <h3>Binomial Option Model</h3>
+                <p>
+                    Interactive binomial tree for pricing American and European options. 
+                    Visualize the option price evolution and early exercise decisions.
+                </p>
+                <span class="solver-status status-coming-soon">Coming Soon</span>
+            </div>
+
+            <!-- Interest Rate Swap Valuation -->
+            <div class="solver-card" style="opacity: 0.7; cursor: not-allowed;">
+                <h3>Interest Rate Swap Valuation</h3>
+                <p>
+                    Value plain vanilla and basis swaps. Calculate swap rates, 
+                    DV01, and perform scenario analysis with yield curve shifts.
+                </p>
+                <span class="solver-status status-coming-soon">Coming Soon</span>
+            </div>
+
+            <!-- Monte Carlo Simulator -->
+            <div class="solver-card" style="opacity: 0.7; cursor: not-allowed;">
+                <h3>Monte Carlo Simulator</h3>
+                <p>
+                    Simulate asset price paths for exotic option pricing. 
+                    Supports various stochastic processes including GBM, jump diffusion, and stochastic volatility.
+                </p>
+                <span class="solver-status status-coming-soon">Coming Soon</span>
+            </div>
+
+            <!-- Futures Margin Calculator -->
+            <div class="solver-card" style="opacity: 0.7; cursor: not-allowed;">
+                <h3>Futures Margin Calculator</h3>
+                <p>
+                    Calculate initial and maintenance margins for futures positions. 
+                    Simulate margin calls and analyze the impact of price movements.
+                </p>
+                <span class="solver-status status-coming-soon">Coming Soon</span>
+            </div>
+
+            <!-- Portfolio Greeks Calculator -->
+            <div class="solver-card" style="opacity: 0.7; cursor: not-allowed;">
+                <h3>Portfolio Greeks Calculator</h3>
+                <p>
+                    Aggregate Greeks for multi-asset option portfolios. 
+                    Perform risk analysis and hedging ratio calculations.
+                </p>
+                <span class="solver-status status-coming-soon">Coming Soon</span>
+            </div>
+
+            <!-- Volatility Surface Builder -->
+            <div class="solver-card" style="opacity: 0.7; cursor: not-allowed;">
+                <h3>Volatility Surface Builder</h3>
+                <p>
+                    Construct and visualize implied volatility surfaces from option prices. 
+                    Interpolate volatilities for any strike and maturity combination.
+                </p>
+                <span class="solver-status status-coming-soon">Coming Soon</span>
+            </div>
+        </div>
+
+        <div style="margin-top: 4rem; padding-top: 2rem; border-top: 1px solid #ddd;">
+            <h2 style="border-bottom: none; font-size: 1.4em; color: #666;">About the Solvers</h2>
+            <p style="color: #666;">
+                These interactive solvers are designed to help you understand and apply derivative pricing models. 
+                Each solver includes detailed explanations of the underlying mathematics, step-by-step calculations, 
+                and the ability to export results for further analysis.
+            </p>
+            <p style="color: #666;">
+                All calculations are performed in your browser using JavaScript for instant results. 
+                The formulas and methodologies used are consistent with the course material and industry standards.
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // Add smooth fade-in animation when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            const cards = document.querySelectorAll('.solver-card');
+            cards.forEach((card, index) => {
+                setTimeout(() => {
+                    card.style.opacity = '0';
+                    card.style.transform = 'translateY(20px)';
+                    card.style.transition = 'all 0.5s ease';
+                    
+                    setTimeout(() => {
+                        card.style.opacity = card.hasAttribute('href') ? '1' : '0.7';
+                        card.style.transform = 'translateY(0)';
+                    }, 50);
+                }, index * 100);
+            });
+        });
+    </script>
+</body>
+</html>
