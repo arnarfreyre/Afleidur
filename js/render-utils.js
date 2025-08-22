@@ -90,12 +90,15 @@ function addCardAnimations(container) {
         card.style.transform = 'translateY(20px)';
         card.style.transition = 'all 0.5s ease';
         
+        // Force browser to recognize the initial state
+        card.offsetHeight;
+        
         // Animate in with delay
         setTimeout(() => {
             const isAvailable = !card.style.cursor || card.style.cursor !== 'not-allowed';
             card.style.opacity = isAvailable ? '1' : '0.7';
             card.style.transform = 'translateY(0)';
-        }, index * 100);
+        }, 50 + index * 100);
     });
 }
 
@@ -210,6 +213,17 @@ function renderProblemSets(containerId, problemSets) {
     });
     
     addCardAnimations(container);
+    
+    // Failsafe: Ensure all cards are visible after animation should be complete
+    setTimeout(() => {
+        const cards = container.querySelectorAll('.problem-set-card');
+        cards.forEach(card => {
+            if (card.style.opacity === '0' || card.style.opacity === '') {
+                card.style.opacity = '1';
+                card.style.transform = 'translateY(0)';
+            }
+        });
+    }, 2000);
 }
 
 // Export for browser use

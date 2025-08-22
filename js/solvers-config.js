@@ -18,8 +18,8 @@ const solversConfig = [
         id: 3,
         title: "Bond Price & Duration Calculator",
         description: "Calculate bond prices, yields to maturity, duration, and convexity. Supports various day count conventions and compounding frequencies.",
-        path: null,
-        status: "coming-soon"
+        path: "Solvers/bond-pricing-calculator.html",
+        status: "available"
     },
     {
         id: 4,
