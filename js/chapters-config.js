@@ -11,8 +11,8 @@ const chaptersConfig = [
         id: 2,
         title: "Chapter 2: Options Fundamentals",
         description: "Introduction to options pricing, payoff structures, put-call parity, and basic strategies. Binomial models and introduction to Black-Scholes framework.",
-        path: "Chapters/Chapter1.html",
-        status: "available"
+        path: null,
+        status: "coming-soon"
     },
     {
         id: 3,
