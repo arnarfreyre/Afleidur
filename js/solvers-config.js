@@ -9,10 +9,10 @@ const solversConfig = [
     },
     {
         id: 2,
-        title: "Black-Scholes Option Pricer",
-        description: "Price European options using the Black-Scholes model. Calculate option values, implied volatility, and all Greeks (Delta, Gamma, Theta, Vega, Rho).",
-        path: null,
-        status: "coming-soon"
+        title: "Forward & Options Payoff Plotter",
+        description: "Interactive tool for plotting payoffs at maturity for forwards, calls, and puts with customizable positions",
+        path: "Solvers/forward-payoff-plotter.html",
+        status: "available"
     },
     {
         id: 3,
@@ -62,7 +62,14 @@ const solversConfig = [
         description: "Construct and visualize implied volatility surfaces from option prices. Interpolate volatilities for any strike and maturity combination.",
         path: null,
         status: "coming-soon"
-    }
+    },
+    {
+        id: 10,
+        title: "Black-Scholes Option Pricer",
+        description: "Price European options using the Black-Scholes model. Calculate option values, implied volatility, and all Greeks (Delta, Gamma, Theta, Vega, Rho).",
+        path: null,
+        status: "coming-soon"
+    },
 ];
 
 // Export for browser use

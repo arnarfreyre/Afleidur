@@ -1,3 +1,7 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
 # T-503-AFLE Derivatives Course Project
 
 ## Project Overview
@@ -11,97 +15,166 @@ This repository contains a comprehensive HTML-based derivatives course with inte
 - **Format:** HTML-based interactive course with Python verification
 - **Focus Areas:** Bond pricing, term structures, options, futures, swaps, risk management
 
+## Common Development Commands
+
+```bash
+# Open the main page in browser
+open index.html
+
+# Run Python verification for solutions (from project root)
+python3 "AA-Extra/Python fact checking/test.py"
+python3 "AA-Extra/Python fact checking/forwards.py"
+
+# Test the website locally with Python's simple HTTP server
+python3 -m http.server 8000
+# Then visit http://localhost:8000 in browser
+
+# Search for specific content across HTML files
+grep -r "Black-Scholes" --include="*.html"
+
+# List all formula pages
+ls formulas/*.html
+
+# View git status to track changed files
+git status
+```
+
 ## 📁 Project Structure & Organization
 
 ```
 Afleiður/
 │
 ├── 📄 Core Files
-│   ├── index.html                    # Main course homepage with navigation
-│   ├── formula-sheet.html            # Comprehensive formula reference (auto-updated)
-│   ├── styles.css                    # Shared styles for all HTML pages
-│   └── CLAUDE.md                     # This file - project guidelines
+│   ├── index.html                    # Main navigation with dynamic tab system
+│   ├── problem-sets.html            # Problem sets overview page
+│   ├── solvers.html                 # Interactive calculators page
+│   ├── formulas.html                # Formula reference navigation
+│   ├── styles.css                   # Shared styles for all HTML pages
+│   └── CLAUDE.md                    # This file - project guidelines
 │
-├── 📚 Chapters/                      # Course content organized by topic
-│   ├── chapter-1-introduction.html   # Introduction to derivatives
-│   ├── chapter-2-forwards-futures.html # Forward contracts and futures
-│   ├── chapter-3-options.html        # Options pricing and strategies
-│   ├── chapter-4-bonds.html          # Bond pricing and duration
-│   ├── chapter-5-swaps.html          # Interest rate and currency swaps
-│   └── chapter-6-risk-management.html # Risk metrics and hedging
+├── 📚 Chapters/                     # Course content organized by topic
+│   ├── Chapter1.html                # Currently available chapter
+│   └── Module 1.1.pdf              # PDF companion material
 │
-├── 📝 Problem-Sets/                  # Practice problems (PDF format)
-│   ├── problem-set-1.pdf            # Introduction and basic concepts
-│   ├── problem-set-2.pdf            # Forwards and futures problems
-│   ├── problem-set-3.pdf            # Options problems
-│   └── problem-set-4.pdf            # Advanced derivatives
+├── 📝 Problem sets/                 # Practice problems (PDF format)
+│   ├── Problem set I - Reminders.pdf  
+│   └── Problem set II - Forwards.pdf
 │
-├── ✅ Solutions/                     # HTML solutions with calculations
-│   ├── Solutions-1.html             # Problem Set 1 solutions
-│   ├── Solutions-2.html             # Problem Set 2 solutions
-│   ├── Solutions-3.html             # Problem Set 3 solutions
-│   └── solutions.txt                # Text-based solution reference
+├── ✅ Solutions/                    # HTML solutions with calculations
+│   ├── Solutions-1.html            # Problem Set 1 solutions
+│   └── Template.html               # Template for new solutions
 │
-├── 🐍 Python-Fact-Checking/         # ALL Python verification scripts
-│   ├── python-solver.py             # Main fact-checking engine
-│   ├── comprehensive_fact_checker.py # Detailed verification tool
-│   ├── bond_pricing_corrected.py    # Bond pricing verification
-│   ├── duration_investigation.py    # Duration calculation checks
-│   ├── verify_solutions.py          # Solution verification
-│   ├── final_verification.py        # Final validation script
-│   └── problem_set_*/               # Organized by problem set
-│       ├── ps1_checker.py
-│       ├── ps2_checker.py
-│       └── ...
+├── 🧮 Solvers/                     # Interactive calculators
+│   ├── bond-pricing-calculator.html
+│   └── forward-rate-calculator.html
 │
-└── 📂 Resources/                     # Additional materials
-    ├── images/                       # Graphs, charts, diagrams
-    ├── data/                        # Market data, examples
-    └── references/                  # Academic papers, links
+├── 📊 formulas/                    # Modular formula pages
+│   ├── bond-pricing.html          
+│   ├── duration-measures.html     
+│   ├── futures-forwards.html      
+│   ├── interest-rates.html        
+│   ├── options-pricing.html       
+│   ├── quick-reference.html       
+│   ├── risk-metrics.html          
+│   ├── swaps.html                 
+│   ├── time-value-money.html      
+│   └── pdf/                       
+│       └── Derivatives - Formula Sheet.pdf
+│
+├── 🔧 js/                          # JavaScript configuration and utilities
+│   ├── chapters-config.js         # Chapter metadata and availability
+│   ├── formulas-config.js         # Formula pages configuration
+│   ├── problemSets.js             # Problem set configuration
+│   ├── render-utils.js            # Shared rendering functions
+│   └── solvers-config.js          # Solver tools configuration
+│
+├── 🐍 AA-Extra/Python fact checking/ # Python verification scripts
+│   ├── test.py                    # General testing script
+│   └── forwards.py                # Forward rate calculations
+│
+└── 📂 AA-Extra/Old course/         # Reference materials from previous course
+    ├── Resources/                  # Formula sheets and handouts
+    └── Tests and Exams/           # Past exams with solutions
 ```
+
+## 🏗 Architecture & Key Systems
+
+### JavaScript Configuration System
+The website uses a modular JavaScript configuration system where content is defined in `/js/*-config.js` files and rendered dynamically:
+
+1. **Configuration Files** (`js/*-config.js`):
+   - Define metadata for chapters, formulas, solvers, and problem sets
+   - Control availability status and paths
+   - Single source of truth for navigation
+
+2. **Render Utilities** (`js/render-utils.js`):
+   - `createCard()`: Generates UI cards for different content types
+   - `renderCards()`: Batch renders collections of cards
+   - Handles availability states and styling
+
+3. **Dynamic Loading Pattern**:
+   ```javascript
+   // Each page loads its config and renders content
+   chaptersConfig → renderUtils.renderCards() → DOM
+   ```
+
+### Navigation System
+- **Tab-based navigation**: Main pages (index, problem-sets, solvers, formulas)
+- **Dynamic content loading**: JavaScript renders cards based on configuration
+- **Availability tracking**: Items marked as 'available' or 'coming-soon' in configs
+
+### Formula Organization
+- **Modular structure**: Each topic has its own HTML file in `/formulas/`
+- **Central navigation**: `formulas.html` serves as the formula hub
+- **Quick reference**: Consolidated formula sheet available as PDF
 
 ## 🎯 Folder Purpose & Content Guidelines
 
-### **index.html** (Main Page)
-- Central navigation hub for the entire course
-- Links to all chapters, problem sets, solutions
-- Quick access to formula sheet
-- Course overview and learning objectives
-- Progress tracking suggestions
+### **Core Navigation Pages**
+- **index.html**: Study materials and chapters
+- **problem-sets.html**: Problem set PDFs and solutions
+- **solvers.html**: Interactive calculators
+- **formulas.html**: Formula reference hub
 
 ### **Chapters/** Folder
 **Purpose:** Sequential course content with theory and examples
-- Each chapter is self-contained HTML with internal navigation
-- Must include: Learning objectives, theory, examples, key formulas
-- Links to: Previous/next chapter, relevant problem sets, formula sheet
-- Update formula sheet when new concepts introduced
+- Currently contains Chapter1.html and Module PDFs
+- Each chapter is self-contained with internal navigation
+- Configured via `js/chapters-config.js`
 
-### **Problem-Sets/** Folder
+### **Problem sets/** Folder
 **Purpose:** Practice problems for student assessment
 - PDF format for easy printing and offline work
-- Correspond to chapter content
-- Increasing difficulty within each set
-- Clear problem numbering for solution reference
+- Named with descriptive titles (e.g., "Problem set I - Reminders.pdf")
 
 ### **Solutions/** Folder
 **Purpose:** Detailed HTML solutions with step-by-step explanations
 - **MANDATORY:** All numerical answers must be Python-verified first
-- Include: Problem statement, methodology, calculations, final answer
-- Show multiple solution approaches when applicable
-- Link to corresponding Python verification script
+- Template.html provides boilerplate for new solutions
+- Currently contains Solutions-1.html
 
-### **Python-Fact-Checking/** Folder
-**Purpose:** Centralized location for ALL verification scripts
-- **Primary Rule:** Every solution must have a corresponding Python check
-- Organized by problem set for easy reference
-- Include comprehensive comments and documentation
-- Output clear PASS/FAIL indicators
+### **Solvers/** Folder
+**Purpose:** Interactive calculation tools
+- bond-pricing-calculator.html: Bond valuation tool
+- forward-rate-calculator.html: Forward rate computations
+- Configured via `js/solvers-config.js`
 
-### **Resources/** Folder
-**Purpose:** Supporting materials and references
-- Images for chapters and solutions
-- Market data files for examples
-- Academic references and further reading
+### **formulas/** Folder
+**Purpose:** Modular formula reference pages
+- Each financial concept has its own HTML file
+- Organized by topic (bonds, options, swaps, etc.)
+- PDF subfolder contains downloadable formula sheet
+
+### **js/** Folder
+**Purpose:** JavaScript configuration and utilities
+- Config files define content metadata and availability
+- render-utils.js provides shared UI generation functions
+- Centralizes navigation and content management
+
+### **AA-Extra/** Folder
+**Purpose:** Python verification and reference materials
+- Python fact checking/: Verification scripts for calculations
+- Old course/: Historical exams, solutions, and resources
 
 ## 🚨 MANDATORY REQUIREMENTS
 
@@ -123,178 +196,79 @@ python3 problem_set_X/psX_problemY.py
 # NEVER skip steps 1 and 2!
 ```
 
-### 2. Formula Sheet Maintenance
+### 2. JavaScript Configuration Updates
 
-**The formula-sheet.html must be updated whenever new formulas are introduced:**
+**When adding new content, update the corresponding config file:**
 
-1. After completing each chapter, review for new formulas
-2. Add formulas to appropriate section in formula-sheet.html
-3. Include: Formula name, mathematical expression, variable definitions, usage notes
-4. Maintain consistent formatting and organization
-
-Formula categories to maintain:
-- Time Value of Money
-- Bond Pricing & Duration
-- Forward & Futures Pricing
-- Options (Black-Scholes, Greeks)
-- Swaps Valuation
-- Risk Metrics
+```javascript
+// Example: Adding a new chapter in js/chapters-config.js
+{
+    title: "Chapter 2: Forward Contracts",
+    description: "Introduction to forward contracts and pricing",
+    path: "Chapters/Chapter2.html",  // or null if not ready
+    status: "available",  // or "coming-soon"
+    pdfFile: "Chapters/Module 2.pdf"  // optional
+}
+```
 
 ### 3. HTML Consistency Standards
 
 All HTML files must:
 - Use shared styles.css for consistent appearance
-- Include navigation header with links to:
-  - Main page (index.html)
-  - Formula sheet
-  - Previous/Next content (where applicable)
+- Include the standard navigation header
 - Use semantic HTML5 elements
-- Include KaTeX for mathematical expressions
+- Include KaTeX for mathematical expressions when needed
 
 ### 4. File Naming Conventions
 
-- **Chapters:** `chapter-[number]-[topic].html` (lowercase, hyphens)
-- **Problem Sets:** `problem-set-[number].pdf`
+- **Chapters:** `Chapter[number].html` (e.g., Chapter1.html)
+- **Problem Sets:** Descriptive names with Roman numerals
 - **Solutions:** `Solutions-[number].html` (capital S)
-- **Python Scripts:** `ps[number]_problem[letter].py` or descriptive names
-- **Images:** `[chapter]_[description].[ext]`
+- **Python Scripts:** Descriptive names in AA-Extra/Python fact checking/
+- **Solvers:** `[topic]-calculator.html`
 
-## 📋 Quality Assurance Checklist
+## 🔧 Development Workflows
 
-### Before Creating New Content
+### Adding New Content
 
-- [ ] Review existing chapters for consistency
-- [ ] Check formula sheet for required updates
-- [ ] Prepare Python verification scripts
+1. **New Chapter:**
+   - Create HTML file in Chapters/
+   - Update `js/chapters-config.js`
+   - Add any companion PDFs
 
-### For Each New Solution
+2. **New Solution:**
+   - First write Python verification in AA-Extra/Python fact checking/
+   - Create HTML solution using Template.html as base
+   - Verify all calculations match Python output
 
-- [ ] Python script created in Python-Fact-Checking/
-- [ ] All calculations verified programmatically
-- [ ] Multiple solution methods tested (when applicable)
-- [ ] Results show "✓ CORRECT" in verification output
-- [ ] HTML solution matches Python output exactly
-- [ ] Links to main page and formula sheet included
-- [ ] Proper mathematical notation using KaTeX
+3. **New Solver/Calculator:**
+   - Create HTML in Solvers/
+   - Update `js/solvers-config.js`
+   - Include interactive JavaScript calculations
 
-### For Each New Chapter
+4. **New Formula Page:**
+   - Create HTML in formulas/
+   - Update `js/formulas-config.js`
+   - Use consistent KaTeX formatting
 
-- [ ] Learning objectives clearly stated
-- [ ] Theory explained with examples
-- [ ] New formulas identified for formula sheet
-- [ ] Links to relevant problem sets included
-- [ ] Navigation to previous/next chapters
-- [ ] Consistent styling with styles.css
+## 🐛 Important Notes
 
-## 🔧 Development Workflow
+### Python Verification Policy
+**ALL numerical answers MUST be verified in Python BEFORE being written to any solution file.**
+- Python scripts go in `AA-Extra/Python fact checking/`
+- Run verification before creating HTML solutions
+- Document any discrepancies found
 
-### Adding a New Chapter
+### Configuration System
+- Content availability is controlled via JavaScript config files
+- Set `status: "coming-soon"` and `path: null` for unavailable content
+- The render utilities will automatically gray out unavailable items
 
-1. Create chapter HTML in Chapters/ folder
-2. Update index.html with link to new chapter
-3. Identify and add new formulas to formula-sheet.html
-4. Create corresponding problem set PDF
-5. Prepare Python verification scripts for problems
-
-### Adding a New Problem Set Solution
-
-1. **First:** Write Python verification in Python-Fact-Checking/
-2. **Verify:** Run script and confirm all answers
-3. **Document:** Create HTML solution with explanations
-4. **Cross-check:** Final verification against Python output
-5. **Link:** Update index.html and relevant pages
-
-### Updating the Formula Sheet
-
-```html
-<!-- Add new formula in appropriate section -->
-<div class="formula-item">
-    <h4>Formula Name</h4>
-    <div class="math">
-        <!-- KaTeX formula here -->
-    </div>
-    <p class="description">When to use this formula...</p>
-</div>
-```
-
-## 🐛 Error Prevention & Debugging
-
-### Common Pitfalls to Avoid
-
-1. **Creating solutions without Python verification**
-   - ❌ Never write HTML solutions first
-   - ✅ Always verify in Python, then document
-
-2. **Forgetting formula sheet updates**
-   - ❌ Don't leave formulas only in chapters
-   - ✅ Systematically update formula sheet with each chapter
-
-3. **Inconsistent file locations**
-   - ❌ Don't mix Python scripts with HTML files
-   - ✅ Keep all Python in Python-Fact-Checking/
-
-4. **Broken navigation links**
-   - ❌ Don't hardcode absolute paths
-   - ✅ Use relative paths for portability
-
-### Error History & Lessons Learned
-
-1. **Q3a Bond Pricing:** Was $1,002.41 → Corrected to $994.87
-   - **Cause:** Wrong compounding method
-   - **Prevention:** Always verify compounding frequency in Python first
-
-2. **Q3c Duration:** Was 19.40 → Corrected to 7.95
-   - **Cause:** Calculation error in PV values
-   - **Prevention:** Verify intermediate calculations, not just final results
-
-## 📚 Quick Reference Commands
-
-```bash
-# Navigate to fact-checking directory
-cd "Python-Fact-Checking"
-
-# Run main solver
-python3 python-solver.py
-
-# Comprehensive verification for Problem Set 1
-python3 comprehensive_fact_checker.py
-
-# Check specific problem
-python3 problem_set_1/ps1_problem3a.py
-
-# Final validation before publishing
-python3 final_verification.py
-```
-
-## 🔗 Course Navigation Structure
-
-```
-index.html
-    ├── Chapters
-    │   ├── Chapter 1: Introduction
-    │   ├── Chapter 2: Forwards & Futures
-    │   └── ...
-    ├── Problem Sets
-    │   ├── Problem Set 1 (PDF)
-    │   ├── Problem Set 2 (PDF)
-    │   └── ...
-    ├── Solutions
-    │   ├── Solutions 1 (HTML)
-    │   ├── Solutions 2 (HTML)
-    │   └── ...
-    └── Formula Sheet (continuously updated)
-```
-
-## 📝 Version Control & Updates
-
-- **Always commit Python verification scripts first**
-- **Tag releases when problem sets are complete**
-- **Document formula sheet updates in commit messages**
-- **Never commit unverified numerical answers**
+### Navigation Consistency
+- All main pages use the tab navigation system
+- Individual content pages should link back to their parent navigation page
+- Use relative paths for all internal links
 
 ---
 
-**Golden Rule:** Every number displayed in the course must be traceable to a Python calculation in the Python-Fact-Checking/ folder. No exceptions.
-
-*Last Updated: Project restructured for comprehensive HTML course delivery*
-*Next Steps: Create formula-sheet.html with existing formulas from Problem Set 1*
+**Golden Rule:** Every numerical calculation displayed in the course must be verifiable through Python scripts in the AA-Extra/Python fact checking/ folder.
