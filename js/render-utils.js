@@ -40,6 +40,23 @@ function createCard(item, type) {
     description.textContent = item.description;
     card.appendChild(description);
     
+    // Add PDF button for chapters if PDF is available
+    if (type === 'chapter' && item.pdfFile) {
+        const pdfButton = document.createElement('button');
+        pdfButton.className = 'btn-primary';
+        pdfButton.textContent = 'Open PDF';
+        pdfButton.style.marginTop = '10px';
+        pdfButton.style.marginBottom = '10px';
+        pdfButton.onclick = function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            const pdfPath = 'Chapters/' + item.pdfFile;
+            // Open in same window for navigation consistency
+            window.location.href = pdfPath;
+        };
+        card.appendChild(pdfButton);
+    }
+    
     // Add status badge
     const statusSpan = document.createElement('span');
     const statusClass = type === 'solver' ? 'solver-status' : 'chapter-status';
@@ -143,11 +160,8 @@ function createProblemSetCard(ps) {
     if (available) {
         pdfButton.onclick = function() {
             const pdfPath = 'Problem sets/' + ps.pdfFile;
-            if (window.openPdfViewer) {
-                window.openPdfViewer(pdfPath, ps.title + ' - PDF');
-            } else {
-                window.location.href = pdfPath;
-            }
+            // Open in same window for navigation consistency
+            window.location.href = pdfPath;
         };
     }
     actions.appendChild(pdfButton);
@@ -181,11 +195,8 @@ function createProblemSetCard(ps) {
         card.onclick = function(e) {
             if (e.target.tagName !== 'BUTTON') {
                 const pdfPath = 'Problem sets/' + ps.pdfFile;
-                if (window.openPdfViewer) {
-                    window.openPdfViewer(pdfPath, ps.title + ' - PDF');
-                } else {
-                    window.location.href = pdfPath;
-                }
+                // Open in same window for navigation consistency
+                window.location.href = pdfPath;
             }
         };
     }
