@@ -9,7 +9,7 @@ const problemSets = [
         chapter: "futures-forwards",
         description: "Introduction to futures and forwards pricing, no-arbitrage conditions, and basic valuation.",
         pdfFile: "Problem set I - Reminders.pdf",
-        solutionFile: null // Will be added later
+        solutionFile: "[Solutions] Problem set I - Reminders.pdf" // Will be added later
     },
     {
         id: 2,

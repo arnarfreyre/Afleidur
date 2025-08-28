@@ -199,6 +199,11 @@
                     <input type="checkbox" id="showIndividual" checked>
                     <span>Show Individual Payoffs</span>
                 </label>
+
+                <label class="checkbox-label">
+                    <input type="checkbox" id="showZeroLine" checked>
+                    <span>Show Zero Line</span>
+                </label>
             </div>
 
             <div class="input-grid">
@@ -562,16 +567,18 @@
                 ctx.stroke();
             }
 
-            // Draw zero line
+            // Draw zero line if enabled
+            const showZeroLine = document.getElementById('showZeroLine').checked;
             const zeroY = canvas.height - padding - ((0 - yMin) / (yMax - yMin)) * plotHeight;
-            ctx.strokeStyle = '#999';
-            ctx.lineWidth = 1;
-            ctx.setLineDash([5, 5]);
-            ctx.beginPath();
-            ctx.moveTo(padding, zeroY);
-            ctx.lineTo(canvas.width - padding, zeroY);
-            ctx.stroke();
-            ctx.setLineDash([]);
+            
+            if (showZeroLine && zeroY >= padding && zeroY <= canvas.height - padding) {
+                ctx.strokeStyle = '#000';
+                ctx.lineWidth = 1.5;
+                ctx.beginPath();
+                ctx.moveTo(padding, zeroY);
+                ctx.lineTo(canvas.width - padding, zeroY);
+                ctx.stroke();
+            }
 
             // Transform functions
             const toX = (price) => padding + ((price - minPrice) / (maxPrice - minPrice)) * plotWidth;
@@ -653,20 +660,61 @@
             ctx.textAlign = 'center';
             ctx.fillText('Payoff Diagram', canvas.width / 2, 30);
 
+            // Helper function to get nice tick values
+            function getNiceTicks(min, max, targetCount) {
+                const range = max - min;
+                const roughStep = range / (targetCount - 1);
+                
+                // Find a nice step value
+                const magnitude = Math.pow(10, Math.floor(Math.log10(roughStep)));
+                const normalized = roughStep / magnitude;
+                
+                let niceStep;
+                if (normalized <= 1) niceStep = magnitude;
+                else if (normalized <= 2) niceStep = 2 * magnitude;
+                else if (normalized <= 5) niceStep = 5 * magnitude;
+                else niceStep = 10 * magnitude;
+                
+                // Calculate nice min and max
+                const niceMin = Math.floor(min / niceStep) * niceStep;
+                const niceMax = Math.ceil(max / niceStep) * niceStep;
+                
+                const ticks = [];
+                for (let val = niceMin; val <= niceMax; val += niceStep) {
+                    if (val >= min && val <= max) {
+                        ticks.push(val);
+                    }
+                }
+                
+                return ticks;
+            }
+
             // X-axis values
             ctx.font = '11px Georgia, serif';
-            for (let i = 0; i <= 5; i++) {
-                const price = minPrice + (maxPrice - minPrice) * i / 5;
+            ctx.fillStyle = '#333';
+            const xTicks = getNiceTicks(minPrice, maxPrice, 7);
+            xTicks.forEach(price => {
                 const x = toX(price);
-                ctx.fillText(`$${price.toFixed(0)}`, x, canvas.height - padding + 35);
-            }
+                ctx.textAlign = 'center';
+                const label = price % 1 === 0 ? price.toString() : price.toFixed(1);
+                ctx.fillText(`$${label}`, x, canvas.height - padding + 35);
+            });
 
             // Y-axis values
             ctx.textAlign = 'right';
-            for (let i = 0; i <= 5; i++) {
-                const payoff = yMin + (yMax - yMin) * i / 5;
+            const yTicks = getNiceTicks(yMin, yMax, 7);
+            yTicks.forEach(payoff => {
                 const y = toY(payoff);
-                ctx.fillText(`$${payoff.toFixed(0)}`, padding - 10, y + 4);
+                const label = Math.abs(payoff) < 0.01 ? '0' : 
+                              payoff % 1 === 0 ? payoff.toString() : payoff.toFixed(1);
+                ctx.fillText(`$${label}`, padding - 10, y + 4);
+            });
+            
+            // Add y=0 label specifically if zero line is shown
+            if (showZeroLine && zeroY >= padding && zeroY <= canvas.height - padding) {
+                ctx.fillStyle = '#000';
+                ctx.font = 'bold 11px Georgia, serif';
+                ctx.fillText('$0', padding - 10, zeroY + 4);
             }
 
             // Update legend
@@ -850,6 +898,7 @@
                 }
             });
             document.getElementById('showIndividual').addEventListener('change', generatePlot);
+            document.getElementById('showZeroLine').addEventListener('change', generatePlot);
 
             // Add the three contracts from the example problem
             contracts = [
