@@ -1,0 +1,940 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Forward Contract Hedging Calculator - Derivatives Course</title>
+    <link rel="stylesheet" href="../styles.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
+    <style>
+        /* Calculator specific styles */
+        .calculator-container {
+            margin-top: 2rem;
+        }
+
+        .calculator-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        @media (max-width: 768px) {
+            .calculator-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .input-section, .output-section {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .input-section h2, .output-section h2 {
+            color: #2c3e50;
+            margin-bottom: 1.5rem;
+            font-size: 1.5em;
+            border-bottom: 2px solid #e74c3c;
+            padding-bottom: 0.5rem;
+        }
+
+        .input-group {
+            margin-bottom: 1.2rem;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #555;
+            font-weight: 600;
+        }
+
+        .input-group input, 
+        .input-group select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        .input-group input:focus,
+        .input-group select:focus {
+            outline: none;
+            border-color: #e74c3c;
+        }
+
+        .input-group small {
+            display: block;
+            margin-top: 0.25rem;
+            color: #666;
+            font-size: 0.85rem;
+        }
+
+        .input-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .calculate-btn {
+            width: 100%;
+            padding: 1rem;
+            background: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+            margin-top: 1rem;
+        }
+
+        .calculate-btn:hover {
+            background: #c0392b;
+        }
+
+        .output-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .output-label {
+            color: #666;
+            font-weight: 500;
+        }
+
+        .output-value {
+            color: #2c3e50;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .output-value.highlight {
+            color: #e74c3c;
+            font-size: 1.3rem;
+        }
+
+        .output-value.positive {
+            color: #27ae60;
+        }
+
+        .output-value.negative {
+            color: #e74c3c;
+        }
+
+        .scenario-box {
+            background: #f8f9fa;
+            border-left: 4px solid #3498db;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 4px;
+        }
+
+        .scenario-box h4 {
+            color: #2c3e50;
+            margin-bottom: 0.5rem;
+        }
+
+        .warning-message {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            color: #856404;
+            padding: 1rem;
+            border-radius: 4px;
+            margin-bottom: 1rem;
+            display: none;
+        }
+
+        .warning-message.show {
+            display: block;
+        }
+
+        .info-tooltip {
+            display: inline-block;
+            background: #3498db;
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            line-height: 18px;
+            text-align: center;
+            font-size: 12px;
+            margin-left: 5px;
+            cursor: help;
+        }
+
+        .sensitivity-analysis {
+            margin-top: 2rem;
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .sensitivity-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        .sensitivity-table th,
+        .sensitivity-table td {
+            padding: 0.75rem;
+            text-align: center;
+            border: 1px solid #ddd;
+        }
+
+        .sensitivity-table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .sensitivity-table tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+
+        .formula-section {
+            margin-top: 2rem;
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .formula-section h3 {
+            color: #2c3e50;
+            margin-bottom: 1.5rem;
+            border-bottom: 2px solid #e74c3c;
+            padding-bottom: 0.5rem;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 1rem;
+            color: #e74c3c;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s;
+        }
+
+        .back-link:hover {
+            color: #c0392b;
+        }
+
+        .summary-box {
+            background: #e8f4f8;
+            border-left: 4px solid #3498db;
+            padding: 1.5rem;
+            border-radius: 4px;
+            margin-top: 2rem;
+        }
+
+        .summary-box h3 {
+            color: #2c3e50;
+            margin-bottom: 1rem;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .summary-item {
+            background: white;
+            padding: 1rem;
+            border-radius: 4px;
+        }
+
+        .summary-label {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .summary-value {
+            color: #2c3e50;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .position-type-toggle {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .position-type-toggle label {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .position-type-toggle input[type="radio"] {
+            margin-right: 0.5rem;
+        }
+
+        .chart-container {
+            margin-top: 2rem;
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .chart-canvas {
+            width: 100%;
+            max-width: 800px;
+            height: 400px;
+            margin: 0 auto;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="main-header">
+            <h1>Forward Contract Hedging Calculator</h1>
+            <p>Analyze forward contract positions for currency hedging</p>
+
+            <!-- Navigation tabs -->
+            <div class="nav-tabs">
+                <a href="../index.html" class="nav-tab">Study Materials</a>
+                <a href="../problem-sets.html" class="nav-tab">Problem Sets</a>
+                <a href="../solvers.html" class="nav-tab active">Solvers</a>
+                <a href="../formulas.html" class="nav-tab">Formulas</a>
+            </div>
+        </div>
+
+        <a href="../solvers.html" class="back-link">← Back to Solvers</a>
+
+        <div class="calculator-container">
+            <div class="calculator-grid">
+                <!-- Input Section -->
+                <div class="input-section">
+                    <h2>Contract Parameters</h2>
+
+                    <div class="input-group">
+                        <label for="positionType">
+                            Position Type
+                            <span class="info-tooltip" data-tooltip="Choose whether you're buying (long) or selling (short) the foreign currency">?</span>
+                        </label>
+                        <div class="position-type-toggle">
+                            <label>
+                                <input type="radio" name="positionType" value="long" checked>
+                                Long (Buy Foreign Currency)
+                            </label>
+                            <label>
+                                <input type="radio" name="positionType" value="short">
+                                Short (Sell Foreign Currency)
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="foreignAmount">
+                            Foreign Currency Amount (millions)
+                            <span class="info-tooltip" data-tooltip="Amount of foreign currency in the contract">?</span>
+                        </label>
+                        <input type="number" id="foreignAmount" value="6.4" step="0.1" min="0">
+                        <small>e.g., 6.4 for €6.4 million</small>
+                    </div>
+
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label for="foreignCurrency">Foreign Currency</label>
+                            <select id="foreignCurrency">
+                                <option value="EUR" selected>EUR - Euro</option>
+                                <option value="GBP">GBP - British Pound</option>
+                                <option value="JPY">JPY - Japanese Yen</option>
+                                <option value="CHF">CHF - Swiss Franc</option>
+                                <option value="CAD">CAD - Canadian Dollar</option>
+                                <option value="AUD">AUD - Australian Dollar</option>
+                            </select>
+                        </div>
+
+                        <div class="input-group">
+                            <label for="domesticCurrency">Domestic Currency</label>
+                            <select id="domesticCurrency">
+                                <option value="USD" selected>USD - US Dollar</option>
+                                <option value="EUR">EUR - Euro</option>
+                                <option value="GBP">GBP - British Pound</option>
+                                <option value="ISK">ISK - Icelandic Króna</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="forwardRate">
+                            Forward Exchange Rate
+                            <span class="info-tooltip" data-tooltip="Agreed exchange rate in the forward contract (domestic per foreign)">?</span>
+                        </label>
+                        <input type="number" id="forwardRate" value="1.22" step="0.001" min="0">
+                        <small>Domestic currency per foreign currency unit</small>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="currentSpotRate">
+                            Current Spot Rate
+                            <span class="info-tooltip" data-tooltip="Current market exchange rate">?</span>
+                        </label>
+                        <input type="number" id="currentSpotRate" value="1.226" step="0.001" min="0">
+                        <small>Current market rate (domestic per foreign)</small>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="timeToMaturity">
+                            Time to Maturity (months)
+                            <span class="info-tooltip" data-tooltip="Time remaining until contract expiry">?</span>
+                        </label>
+                        <input type="number" id="timeToMaturity" value="4" step="0.25" min="0">
+                        <small>Months until contract settlement</small>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="domesticRate">
+                            Domestic Interest Rate (% p.a.)
+                            <span class="info-tooltip" data-tooltip="Risk-free rate in domestic currency for fair value calculation">?</span>
+                        </label>
+                        <input type="number" id="domesticRate" value="5" step="0.1" min="0">
+                        <small>Annual interest rate for domestic currency</small>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="foreignRate">
+                            Foreign Interest Rate (% p.a.)
+                            <span class="info-tooltip" data-tooltip="Risk-free rate in foreign currency for fair value calculation">?</span>
+                        </label>
+                        <input type="number" id="foreignRate" value="3" step="0.1" min="0">
+                        <small>Annual interest rate for foreign currency</small>
+                    </div>
+
+                    <button class="calculate-btn" onclick="calculateForwardContract()">Calculate Results</button>
+                </div>
+
+                <!-- Output Section -->
+                <div class="output-section">
+                    <h2>Analysis Results</h2>
+
+                    <div class="warning-message" id="warningMessage"></div>
+
+                    <div class="output-item">
+                        <div class="output-label">Contract Notional Value</div>
+                        <div class="output-value" id="notionalValue">-</div>
+                    </div>
+
+                    <div class="output-item">
+                        <div class="output-label">Current Spot Value</div>
+                        <div class="output-value" id="spotValue">-</div>
+                    </div>
+
+                    <div class="output-item">
+                        <div class="output-label">Gain/Loss at Current Spot</div>
+                        <div class="output-value highlight" id="currentGainLoss">-</div>
+                    </div>
+
+                    <div class="output-item">
+                        <div class="output-label">Fair Value to Unwind</div>
+                        <div class="output-value highlight" id="fairValue">-</div>
+                    </div>
+
+                    <div class="output-item">
+                        <div class="output-label">Theoretical Forward Rate</div>
+                        <div class="output-value" id="theoreticalForward">-</div>
+                    </div>
+
+                    <div class="output-item">
+                        <div class="output-label">Forward Premium/Discount</div>
+                        <div class="output-value" id="forwardPremium">-</div>
+                    </div>
+
+                    <div class="output-item">
+                        <div class="output-label">Break-even Spot Rate</div>
+                        <div class="output-value" id="breakEvenRate">-</div>
+                    </div>
+
+                    <div class="output-item">
+                        <div class="output-label">Maximum Risk</div>
+                        <div class="output-value" id="maxRisk">-</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Summary Box -->
+            <div class="summary-box" id="summaryBox" style="display: none;">
+                <h3>Position Summary</h3>
+                <div class="summary-grid">
+                    <div class="summary-item">
+                        <div class="summary-label">Contract Type</div>
+                        <div class="summary-value" id="contractType">-</div>
+                    </div>
+                    <div class="summary-item">
+                        <div class="summary-label">Hedge Effectiveness</div>
+                        <div class="summary-value" id="hedgeEffectiveness">-</div>
+                    </div>
+                    <div class="summary-item">
+                        <div class="summary-label">Days to Maturity</div>
+                        <div class="summary-value" id="daysToMaturity">-</div>
+                    </div>
+                    <div class="summary-item">
+                        <div class="summary-label">Annualized Return</div>
+                        <div class="summary-value" id="annualizedReturn">-</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Scenario Analysis -->
+            <div class="sensitivity-analysis" id="sensitivityAnalysis" style="display: none;">
+                <h3>Scenario Analysis</h3>
+                <p>Gain/Loss at different spot rates at maturity:</p>
+                <table class="sensitivity-table">
+                    <thead>
+                        <tr>
+                            <th>Spot Rate</th>
+                            <th>Spot Value</th>
+                            <th>Forward Value</th>
+                            <th>Gain/Loss</th>
+                            <th>% Return</th>
+                            <th>Hedge Result</th>
+                        </tr>
+                    </thead>
+                    <tbody id="sensitivityTableBody">
+                        <!-- Populated by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Payoff Chart -->
+            <div class="chart-container" id="chartContainer" style="display: none;">
+                <h3>Payoff Diagram</h3>
+                <canvas id="payoffChart" class="chart-canvas"></canvas>
+                <p style="text-align: center; margin-top: 1rem; color: #666;">
+                    <small>Shows gain/loss profile at different spot rates at maturity</small>
+                </p>
+            </div>
+
+            <!-- Formula Reference -->
+            <div class="formula-section">
+                <h3>Key Formulas</h3>
+                <div class="math">
+                    <p><strong>Gain/Loss (Long Position):</strong></p>
+                    $$\text{Gain/Loss} = \text{Amount} \times (S_T - F)$$
+                    <p><small>Where: S<sub>T</sub> = Spot rate at maturity, F = Forward rate</small></p>
+
+                    <p><strong>Fair Value to Unwind:</strong></p>
+                    $$\text{Fair Value} = \text{Amount} \times (S_0 - F) \times e^{-r \cdot T}$$
+                    <p><small>Where: S<sub>0</sub> = Current spot rate, r = domestic rate, T = time to maturity</small></p>
+
+                    <p><strong>Covered Interest Rate Parity:</strong></p>
+                    $$F = S_0 \times \frac{(1 + r_d \cdot T)}{(1 + r_f \cdot T)}$$
+                    <p><small>Where: r<sub>d</sub> = domestic rate, r<sub>f</sub> = foreign rate</small></p>
+
+                    <p><strong>Forward Premium/Discount:</strong></p>
+                    $$\text{Premium} = \frac{F - S_0}{S_0} \times \frac{12}{T} \times 100\%$$
+                    <p><small>Annualized percentage difference between forward and spot</small></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize KaTeX
+        document.addEventListener("DOMContentLoaded", function() {
+            renderMathInElement(document.body, {
+                delimiters: [
+                    {left: '$$', right: '$$', display: true},
+                    {left: '$', right: '$', display: false}
+                ],
+                throwOnError: false
+            });
+        });
+
+        function calculateForwardContract() {
+            // Clear previous warnings
+            hideWarning();
+
+            // Get input values
+            const positionType = document.querySelector('input[name="positionType"]:checked').value;
+            const foreignAmount = parseFloat(document.getElementById('foreignAmount').value);
+            const foreignCurrency = document.getElementById('foreignCurrency').value;
+            const domesticCurrency = document.getElementById('domesticCurrency').value;
+            const forwardRate = parseFloat(document.getElementById('forwardRate').value);
+            const currentSpotRate = parseFloat(document.getElementById('currentSpotRate').value);
+            const timeToMaturity = parseFloat(document.getElementById('timeToMaturity').value);
+            const domesticRate = parseFloat(document.getElementById('domesticRate').value) / 100;
+            const foreignRate = parseFloat(document.getElementById('foreignRate').value) / 100;
+
+            // Validate inputs
+            if (!foreignAmount || !forwardRate || !currentSpotRate || !timeToMaturity) {
+                showWarning("Please fill in all required fields");
+                return;
+            }
+
+            if (foreignAmount <= 0 || forwardRate <= 0 || currentSpotRate <= 0 || timeToMaturity < 0) {
+                showWarning("Please enter positive values for all fields");
+                return;
+            }
+
+            // Calculate values
+            const timeInYears = timeToMaturity / 12;
+            const notionalValue = foreignAmount * forwardRate;
+            const spotValue = foreignAmount * currentSpotRate;
+            
+            // Gain/Loss calculation depends on position type
+            let gainLoss;
+            if (positionType === 'long') {
+                // Long position: benefit when spot > forward
+                gainLoss = foreignAmount * (currentSpotRate - forwardRate);
+            } else {
+                // Short position: benefit when spot < forward
+                gainLoss = foreignAmount * (forwardRate - currentSpotRate);
+            }
+
+            // Fair value to unwind (present value of gain/loss)
+            const discountFactor = Math.exp(-domesticRate * timeInYears);
+            const fairValue = gainLoss * discountFactor;
+
+            // Theoretical forward rate (covered interest rate parity)
+            const theoreticalForward = currentSpotRate * Math.exp((domesticRate - foreignRate) * timeInYears);
+
+            // Forward premium/discount (annualized)
+            const forwardPremium = ((forwardRate - currentSpotRate) / currentSpotRate) * (12 / timeToMaturity) * 100;
+
+            // Break-even rate (where gain/loss = 0)
+            const breakEvenRate = forwardRate;
+
+            // Maximum risk
+            const maxRisk = positionType === 'long' ? notionalValue : "Unlimited (short position)";
+
+            // Annualized return
+            const annualizedReturn = (gainLoss / notionalValue) * (12 / timeToMaturity) * 100;
+
+            // Days to maturity
+            const daysToMaturity = Math.round(timeToMaturity * 30.44);
+
+            // Hedge effectiveness
+            let hedgeEffectiveness;
+            if (Math.abs(gainLoss) < notionalValue * 0.02) {
+                hedgeEffectiveness = "Highly Effective";
+            } else if (Math.abs(gainLoss) < notionalValue * 0.05) {
+                hedgeEffectiveness = "Moderately Effective";
+            } else {
+                hedgeEffectiveness = "Less Effective";
+            }
+
+            // Format currency symbols
+            const currencySymbols = {
+                'USD': '$',
+                'EUR': '€',
+                'GBP': '£',
+                'JPY': '¥',
+                'CHF': 'CHF ',
+                'CAD': 'C$',
+                'AUD': 'A$',
+                'ISK': 'ISK '
+            };
+            const domesticSymbol = currencySymbols[domesticCurrency] || domesticCurrency + ' ';
+
+            // Update outputs
+            document.getElementById('notionalValue').textContent = domesticSymbol + notionalValue.toFixed(3) + 'm';
+            document.getElementById('spotValue').textContent = domesticSymbol + spotValue.toFixed(3) + 'm';
+            
+            const gainLossElement = document.getElementById('currentGainLoss');
+            gainLossElement.textContent = domesticSymbol + Math.abs(gainLoss).toFixed(3) + 'm';
+            gainLossElement.className = gainLoss >= 0 ? 'output-value highlight positive' : 'output-value highlight negative';
+            if (gainLoss >= 0) {
+                gainLossElement.textContent = '+' + gainLossElement.textContent + ' (Gain)';
+            } else {
+                gainLossElement.textContent = '-' + gainLossElement.textContent.substring(1) + ' (Loss)';
+            }
+
+            const fairValueElement = document.getElementById('fairValue');
+            fairValueElement.textContent = domesticSymbol + Math.abs(fairValue).toFixed(3) + 'm';
+            fairValueElement.className = fairValue >= 0 ? 'output-value highlight positive' : 'output-value highlight negative';
+
+            document.getElementById('theoreticalForward').textContent = theoreticalForward.toFixed(4) + ' ' + domesticCurrency + '/' + foreignCurrency;
+            document.getElementById('forwardPremium').textContent = forwardPremium.toFixed(2) + '% p.a.';
+            document.getElementById('breakEvenRate').textContent = breakEvenRate.toFixed(4) + ' ' + domesticCurrency + '/' + foreignCurrency;
+            
+            if (typeof maxRisk === 'number') {
+                document.getElementById('maxRisk').textContent = domesticSymbol + maxRisk.toFixed(3) + 'm';
+            } else {
+                document.getElementById('maxRisk').textContent = maxRisk;
+            }
+
+            // Update summary
+            document.getElementById('contractType').textContent = positionType === 'long' ? 
+                'Long ' + foreignCurrency + ' / Short ' + domesticCurrency :
+                'Short ' + foreignCurrency + ' / Long ' + domesticCurrency;
+            document.getElementById('hedgeEffectiveness').textContent = hedgeEffectiveness;
+            document.getElementById('daysToMaturity').textContent = daysToMaturity + ' days';
+            document.getElementById('annualizedReturn').textContent = annualizedReturn.toFixed(2) + '%';
+
+            // Perform sensitivity analysis
+            performSensitivityAnalysis(foreignAmount, forwardRate, positionType, domesticSymbol, foreignCurrency, domesticCurrency);
+
+            // Draw payoff chart
+            drawPayoffChart(foreignAmount, forwardRate, positionType, currentSpotRate);
+
+            // Show additional sections
+            document.getElementById('summaryBox').style.display = 'block';
+            document.getElementById('sensitivityAnalysis').style.display = 'block';
+            document.getElementById('chartContainer').style.display = 'block';
+        }
+
+        function performSensitivityAnalysis(amount, forwardRate, positionType, symbol, foreignCurrency, domesticCurrency) {
+            const tbody = document.getElementById('sensitivityTableBody');
+            tbody.innerHTML = '';
+
+            // Define spot rate scenarios around the forward rate
+            const scenarios = [
+                forwardRate * 0.90,
+                forwardRate * 0.95,
+                forwardRate * 0.98,
+                forwardRate,
+                forwardRate * 1.02,
+                forwardRate * 1.05,
+                forwardRate * 1.10
+            ];
+
+            scenarios.forEach(spotRate => {
+                const spotValue = amount * spotRate;
+                const forwardValue = amount * forwardRate;
+                
+                let gainLoss;
+                if (positionType === 'long') {
+                    gainLoss = amount * (spotRate - forwardRate);
+                } else {
+                    gainLoss = amount * (forwardRate - spotRate);
+                }
+
+                const percentReturn = (gainLoss / forwardValue) * 100;
+                
+                let hedgeResult;
+                if (Math.abs(gainLoss) < 0.001) {
+                    hedgeResult = 'Break-even';
+                } else if (gainLoss > 0) {
+                    hedgeResult = positionType === 'long' ? 'Profitable' : 'Profitable';
+                } else {
+                    hedgeResult = positionType === 'long' ? 'Loss' : 'Loss';
+                }
+
+                const row = tbody.insertRow();
+                row.insertCell(0).textContent = spotRate.toFixed(4);
+                row.insertCell(1).textContent = symbol + spotValue.toFixed(3) + 'm';
+                row.insertCell(2).textContent = symbol + forwardValue.toFixed(3) + 'm';
+                
+                const gainLossCell = row.insertCell(3);
+                gainLossCell.textContent = symbol + Math.abs(gainLoss).toFixed(3) + 'm';
+                if (gainLoss >= 0) {
+                    gainLossCell.style.color = '#27ae60';
+                    gainLossCell.textContent = '+' + gainLossCell.textContent;
+                } else {
+                    gainLossCell.style.color = '#e74c3c';
+                    gainLossCell.textContent = '-' + gainLossCell.textContent;
+                }
+                
+                row.insertCell(4).textContent = percentReturn.toFixed(2) + '%';
+                
+                const resultCell = row.insertCell(5);
+                resultCell.textContent = hedgeResult;
+                if (hedgeResult === 'Profitable') {
+                    resultCell.style.color = '#27ae60';
+                    resultCell.style.fontWeight = '600';
+                } else if (hedgeResult === 'Loss') {
+                    resultCell.style.color = '#e74c3c';
+                    resultCell.style.fontWeight = '600';
+                }
+
+                // Highlight the break-even row
+                if (Math.abs(spotRate - forwardRate) < 0.0001) {
+                    row.style.background = '#e8f4f8';
+                    row.style.fontWeight = 'bold';
+                }
+            });
+        }
+
+        function drawPayoffChart(amount, forwardRate, positionType, currentSpot) {
+            const canvas = document.getElementById('payoffChart');
+            const ctx = canvas.getContext('2d');
+            
+            // Set canvas size
+            const rect = canvas.getBoundingClientRect();
+            canvas.width = rect.width;
+            canvas.height = 400;
+            
+            const width = canvas.width;
+            const height = canvas.height;
+            const padding = 60;
+            
+            // Clear canvas
+            ctx.clearRect(0, 0, width, height);
+            
+            // Calculate data points
+            const minRate = forwardRate * 0.8;
+            const maxRate = forwardRate * 1.2;
+            const points = [];
+            
+            for (let i = 0; i <= 100; i++) {
+                const rate = minRate + (maxRate - minRate) * (i / 100);
+                let payoff;
+                if (positionType === 'long') {
+                    payoff = amount * (rate - forwardRate);
+                } else {
+                    payoff = amount * (forwardRate - rate);
+                }
+                points.push({ rate, payoff });
+            }
+            
+            // Find min and max payoff for scaling
+            const minPayoff = Math.min(...points.map(p => p.payoff));
+            const maxPayoff = Math.max(...points.map(p => p.payoff));
+            const payoffRange = maxPayoff - minPayoff;
+            
+            // Draw axes
+            ctx.strokeStyle = '#333';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            
+            // Y-axis
+            ctx.moveTo(padding, padding);
+            ctx.lineTo(padding, height - padding);
+            
+            // X-axis (at zero payoff)
+            const zeroY = height - padding - ((0 - minPayoff) / payoffRange) * (height - 2 * padding);
+            ctx.moveTo(padding, zeroY);
+            ctx.lineTo(width - padding, zeroY);
+            ctx.stroke();
+            
+            // Draw grid lines
+            ctx.strokeStyle = '#ddd';
+            ctx.lineWidth = 0.5;
+            
+            // Vertical grid lines
+            for (let i = 0; i <= 5; i++) {
+                const x = padding + (i / 5) * (width - 2 * padding);
+                ctx.beginPath();
+                ctx.moveTo(x, padding);
+                ctx.lineTo(x, height - padding);
+                ctx.stroke();
+            }
+            
+            // Horizontal grid lines
+            for (let i = 0; i <= 5; i++) {
+                const y = padding + (i / 5) * (height - 2 * padding);
+                ctx.beginPath();
+                ctx.moveTo(padding, y);
+                ctx.lineTo(width - padding, y);
+                ctx.stroke();
+            }
+            
+            // Draw payoff line
+            ctx.strokeStyle = '#e74c3c';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            
+            points.forEach((point, i) => {
+                const x = padding + ((point.rate - minRate) / (maxRate - minRate)) * (width - 2 * padding);
+                const y = height - padding - ((point.payoff - minPayoff) / payoffRange) * (height - 2 * padding);
+                
+                if (i === 0) {
+                    ctx.moveTo(x, y);
+                } else {
+                    ctx.lineTo(x, y);
+                }
+            });
+            ctx.stroke();
+            
+            // Mark break-even point
+            const breakEvenX = padding + ((forwardRate - minRate) / (maxRate - minRate)) * (width - 2 * padding);
+            ctx.fillStyle = '#3498db';
+            ctx.beginPath();
+            ctx.arc(breakEvenX, zeroY, 6, 0, 2 * Math.PI);
+            ctx.fill();
+            
+            // Mark current spot rate
+            const currentX = padding + ((currentSpot - minRate) / (maxRate - minRate)) * (width - 2 * padding);
+            const currentPayoff = positionType === 'long' ? 
+                amount * (currentSpot - forwardRate) : 
+                amount * (forwardRate - currentSpot);
+            const currentY = height - padding - ((currentPayoff - minPayoff) / payoffRange) * (height - 2 * padding);
+            
+            ctx.fillStyle = '#27ae60';
+            ctx.beginPath();
+            ctx.arc(currentX, currentY, 6, 0, 2 * Math.PI);
+            ctx.fill();
+            
+            // Add labels
+            ctx.fillStyle = '#333';
+            ctx.font = '12px Arial';
+            ctx.textAlign = 'center';
+            
+            // X-axis labels
+            for (let i = 0; i <= 5; i++) {
+                const rate = minRate + (i / 5) * (maxRate - minRate);
+                const x = padding + (i / 5) * (width - 2 * padding);
+                ctx.fillText(rate.toFixed(3), x, height - padding + 20);
+            }
+            
+            // Y-axis labels
+            ctx.textAlign = 'right';
+            for (let i = 0; i <= 5; i++) {
+                const payoff = maxPayoff - (i / 5) * payoffRange;
+                const y = padding + (i / 5) * (height - 2 * padding);
+                ctx.fillText(payoff.toFixed(1) + 'm', padding - 10, y + 5);
+            }
+            
+            // Add title
+            ctx.fillStyle = '#2c3e50';
+            ctx.font = 'bold 14px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('Forward Contract Payoff at Maturity', width / 2, 30);
+            
+            // Add legend
+            ctx.font = '11px Arial';
+            ctx.textAlign = 'left';
+            
+            ctx.fillStyle = '#3498db';
+            ctx.fillRect(width - padding - 150, padding, 10, 10);
+            ctx.fillStyle = '#333';
+            ctx.fillText('Break-even', width - padding - 135, padding + 9);
+            
+            ctx.fillStyle = '#27ae60';
+            ctx.fillRect(width - padding - 150, padding + 20, 10, 10);
+            ctx.fillStyle = '#333';
+            ctx.fillText('Current Spot', width - padding - 135, padding + 29);
+            
+            // Add axis labels
+            ctx.save();
+            ctx.translate(20, height / 2);
+            ctx.rotate(-Math.PI / 2);
+            ctx.textAlign = 'center';
+            ctx.fillText('Payoff (millions)', 0, 0);
+            ctx.restore();
+            
+            ctx.textAlign = 'center';
+            ctx.fillText('Spot Rate at Maturity', width / 2, height - 10);
+        }
+
+        function showWarning(message) {
+            const warningElement = document.getElementById('warningMessage');
+            warningElement.textContent = message;
+            warningElement.classList.add('show');
+        }
+
+        function hideWarning() {
+            document.getElementById('warningMessage').classList.remove('show');
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,1099 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Derivatives Formula Sheet</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- MathJax for LaTeX rendering -->
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            },
+            startup: {
+                ready: () => {
+                    MathJax.startup.defaultReady();
+                    MathJax.startup.promise.then(() => {
+                        renderPage();
+                    });
+                }
+            }
+        };
+    </script>
+    <style>
+        :root {
+            /* Default values - will be overridden by CONFIG */
+            --page-margin: 2mm;
+            --page-padding: 2mm;
+            --font-page-title: 12pt;
+            --font-section-title: 9pt;
+            --font-table-header: 7pt;
+            --font-formula-id: 6pt;
+            --font-description: 7pt;
+            --font-math-formula: 7pt;
+            --font-notes: 6pt;
+            --font-compact-notes: 5.5pt;
+            --section-margin-top: 3px;
+            --section-margin-bottom: 2px;
+            --table-margin-bottom: 3px;
+            --title-margin-bottom: 3px;
+            --section-border-width: 1px;
+            --table-cell-padding-normal: 1px 2px;
+            --table-cell-padding-compact: 0px 2px;
+            --table-border-width: 0.5px;
+            --table-header-padding: 1px 3px;
+            --table-row-hover-color: #f9f9f9;
+            --line-height-normal: 1.1;
+            --line-height-compact: 1.0;
+            --line-height-title: 1.2;
+        }
+
+        @media print {
+            .no-print {
+                display: none !important;
+            }
+            .page {
+                page-break-after: always;
+                margin: 0;
+                padding: var(--page-padding);
+            }
+            body {
+                background: white;
+                margin: 0;
+                padding: 0;
+            }
+            /* Hide the normal content container during print */
+            #pageContent {
+                display: none !important;
+            }
+            /* Show the print container only during print */
+            #printContainer {
+                display: block !important;
+            }
+            @page {
+                margin: var(--page-margin);
+                size: A4;
+            }
+        }
+
+        .page {
+            padding: var(--page-padding);
+            min-height: 29.7cm;
+        }
+
+        .page h1 {
+            font-size: var(--font-page-title);
+            line-height: var(--line-height-title);
+            margin-bottom: var(--title-margin-bottom);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: var(--table-margin-bottom);
+            font-size: var(--font-math-formula);
+        }
+
+        th {
+            background-color: #f0f0f0;
+            font-weight: bold;
+            padding: var(--table-header-padding);
+            border: var(--table-border-width) solid #ccc;
+            text-align: left;
+            font-size: var(--font-table-header);
+            line-height: var(--line-height-compact);
+        }
+
+        td {
+            padding: var(--table-cell-padding-normal);
+            border: var(--table-border-width) solid #ddd;
+            vertical-align: middle;
+            line-height: var(--line-height-compact);
+        }
+
+        .formula-id {
+            font-family: 'Courier New', monospace;
+            font-size: var(--font-formula-id);
+            color: #555;
+            font-weight: bold;
+        }
+
+        .section-title {
+            font-weight: bold;
+            font-size: var(--font-section-title);
+            margin-top: var(--section-margin-top);
+            margin-bottom: var(--section-margin-bottom);
+            border-bottom: var(--section-border-width) solid #333;
+            padding-bottom: 1px;
+            line-height: var(--line-height-normal);
+        }
+
+        .math-cell {
+            font-size: var(--font-math-formula);
+        }
+
+        .note-cell {
+            font-size: var(--font-notes);
+            color: #666;
+            font-style: italic;
+        }
+
+        .desc-cell {
+            font-weight: 600;
+            font-size: var(--font-description);
+        }
+
+        tr:hover {
+            background-color: var(--table-row-hover-color);
+        }
+
+        .compact-table td {
+            padding: var(--table-cell-padding-compact);
+        }
+
+        .formula-table {
+            margin-bottom: var(--table-margin-bottom);
+        }
+    </style>
+</head>
+<body>
+    <div class="min-h-screen bg-gray-100 p-8">
+        <div class="no-print flex justify-center gap-4 mb-6">
+            <button onclick="downloadPDF()" class="flex items-center gap-2 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors font-semibold">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14 2v11a2 2 0 0 1-2 2H2" />
+                    <path d="M14 2H8v10h8V2Z" />
+                    <path d="m14 2 8 8v11a2 2 0 0 1-2 2H12" />
+                    <path d="m22 10-8-8" />
+                </svg>
+                Download PDF
+            </button>
+            <button onclick="flipPage()" class="flex items-center gap-2 bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors font-semibold">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M2 12h10" />
+                    <path d="m5 9-3 3 3 3" />
+                    <path d="M22 12H12" />
+                    <path d="m19 9 3 3-3 3" />
+                </svg>
+                Flip Page
+            </button>
+        </div>
+
+        <div class="max-w-[21cm] mx-auto bg-white shadow-2xl">
+            <div id="pageContent">
+                <!-- Content will be inserted by JavaScript -->
+            </div>
+        </div>
+
+        <div id="pageIndicator" class="no-print text-center mt-4 text-gray-600 font-semibold">
+            Front Page
+        </div>
+
+        <!-- Hidden print container for both pages -->
+        <div id="printContainer" style="display: none;">
+            <div id="printPage1"></div>
+            <div id="printPage2"></div>
+        </div>
+    </div>
+
+    <script>
+        // ============================================
+        // CONFIGURATION - Adjust these values to customize the layout
+        // ============================================
+        //
+        // QUICK TIPS FOR MAXIMUM COMPRESSION:
+        // - Reduce all font sizes by 1-2pt for more content
+        // - Set page.margin to '1mm' or even '0mm' for absolute minimum
+        // - Reduce spacing values to '1px' or '0px'
+        // - Set lineHeight.compact to '0.9' for tighter lines
+        // - Reduce table.cellPaddingNormal to '0px 1px'
+        //
+        // ULTRA-COMPRESSED EXAMPLE (uncomment to use):
+        // page: { margin: '1mm', padding: '1mm' },
+        // fonts: { pageTitle: '10pt', sectionTitle: '7pt', tableHeader: '6pt',
+        //          formulaId: '5pt', description: '6pt', mathFormula: '6pt',
+        //          notes: '5pt', compactNotes: '4.5pt' },
+        // spacing: { sectionMarginTop: '1px', sectionMarginBottom: '1px',
+        //           tablemarginBottom: '1px', titleMarginBottom: '1px' },
+        // table: { cellPaddingNormal: '0px 1px', cellPaddingCompact: '0px 1px' },
+        // lineHeight: { normal: '0.95', compact: '0.9', title: '1.0' }
+        //
+        const CONFIG = {
+            // Page margins (for printing)
+            page: {
+                margin: '2mm',           // Extremely minimal page margin
+                padding: '2mm'           // Content padding inside the page
+            },
+
+            // Font sizes
+            fonts: {
+                pageTitle: '12pt',       // Main page title
+                sectionTitle: '9pt',     // Section headers
+                tableHeader: '7pt',      // Table column headers
+                formulaId: '6pt',        // Formula ID codes
+                description: '7pt',      // Description cells
+                mathFormula: '7pt',      // Math formulas
+                notes: '6pt',            // Notes/comments
+                compactNotes: '5.5pt'    // Extra compact notes
+            },
+
+            // Spacing
+            spacing: {
+                sectionMarginTop: '3px',     // Space above sections
+                sectionMarginBottom: '2px',  // Space below section titles
+                tablemarginBottom: '3px',     // Space between tables
+                titleMarginBottom: '3px',     // Space below main title
+                sectionBorderWidth: '1px'    // Section title underline
+            },
+
+            // Table styling
+            table: {
+                cellPaddingNormal: '1px 2px',    // Normal cell padding
+                cellPaddingCompact: '0px 2px',   // Compact cell padding
+                borderWidth: '0.5px',             // Table border width
+                headerPadding: '1px 3px',         // Header cell padding
+                rowHoverColor: '#f9f9f9'          // Row hover color
+            },
+
+            // Line heights
+            lineHeight: {
+                normal: '1.1',           // Normal line height
+                compact: '1.0',          // Compact line height
+                title: '1.2'             // Title line height
+            },
+
+            // Column widths (can be adjusted per table needs)
+            columns: {
+                id: '15%',               // ID column width
+                description: '25%',      // Description column
+                formula: '38%',          // Formula column
+                notes: '22%'             // Notes column
+            }
+        };
+
+        // Apply CONFIG values to CSS custom properties
+        function applyCSSVariables() {
+            const root = document.documentElement;
+
+            // Page settings
+            root.style.setProperty('--page-margin', CONFIG.page.margin);
+            root.style.setProperty('--page-padding', CONFIG.page.padding);
+
+            // Font sizes
+            root.style.setProperty('--font-page-title', CONFIG.fonts.pageTitle);
+            root.style.setProperty('--font-section-title', CONFIG.fonts.sectionTitle);
+            root.style.setProperty('--font-table-header', CONFIG.fonts.tableHeader);
+            root.style.setProperty('--font-formula-id', CONFIG.fonts.formulaId);
+            root.style.setProperty('--font-description', CONFIG.fonts.description);
+            root.style.setProperty('--font-math-formula', CONFIG.fonts.mathFormula);
+            root.style.setProperty('--font-notes', CONFIG.fonts.notes);
+            root.style.setProperty('--font-compact-notes', CONFIG.fonts.compactNotes);
+
+            // Spacing
+            root.style.setProperty('--section-margin-top', CONFIG.spacing.sectionMarginTop);
+            root.style.setProperty('--section-margin-bottom', CONFIG.spacing.sectionMarginBottom);
+            root.style.setProperty('--table-margin-bottom', CONFIG.spacing.tablemarginBottom);
+            root.style.setProperty('--title-margin-bottom', CONFIG.spacing.titleMarginBottom);
+            root.style.setProperty('--section-border-width', CONFIG.spacing.sectionBorderWidth);
+
+            // Table styling
+            root.style.setProperty('--table-cell-padding-normal', CONFIG.table.cellPaddingNormal);
+            root.style.setProperty('--table-cell-padding-compact', CONFIG.table.cellPaddingCompact);
+            root.style.setProperty('--table-border-width', CONFIG.table.borderWidth);
+            root.style.setProperty('--table-header-padding', CONFIG.table.headerPadding);
+            root.style.setProperty('--table-row-hover-color', CONFIG.table.rowHoverColor);
+
+            // Line heights
+            root.style.setProperty('--line-height-normal', CONFIG.lineHeight.normal);
+            root.style.setProperty('--line-height-compact', CONFIG.lineHeight.compact);
+            root.style.setProperty('--line-height-title', CONFIG.lineHeight.title);
+        }
+
+        // Apply CSS variables on page load
+        applyCSSVariables();
+
+        let showFront = true;
+
+        function flipPage() {
+            showFront = !showFront;
+            renderPage();
+        }
+
+        function downloadPDF() {
+            // Get the print container
+            const printContainer = document.getElementById('printContainer');
+            const printPage1 = document.getElementById('printPage1');
+            const printPage2 = document.getElementById('printPage2');
+
+            // Add both pages to the print container
+            printPage1.innerHTML = getFrontPageHTML();
+            printPage2.innerHTML = getBackPageHTML();
+
+            // Show the print container temporarily
+            printContainer.style.display = 'block';
+
+            // Re-render MathJax for the print container
+            if (window.MathJax && window.MathJax.typesetPromise) {
+                MathJax.typesetPromise([printContainer]).then(() => {
+                    // Trigger print after MathJax rendering
+                    window.print();
+                    // Hide the print container after printing
+                    setTimeout(() => {
+                        printContainer.style.display = 'none';
+                    }, 100);
+                }).catch((e) => {
+                    console.error(e);
+                    // Still print even if MathJax fails
+                    window.print();
+                    setTimeout(() => {
+                        printContainer.style.display = 'none';
+                    }, 100);
+                });
+            } else {
+                // If MathJax is not available, print directly
+                window.print();
+                setTimeout(() => {
+                    printContainer.style.display = 'none';
+                }, 100);
+            }
+        }
+
+        function renderPage() {
+            const pageContent = document.getElementById('pageContent');
+            const pageIndicator = document.getElementById('pageIndicator');
+
+            if (showFront) {
+                pageContent.innerHTML = getFrontPageHTML();
+                pageIndicator.textContent = 'Front Page';
+            } else {
+                pageContent.innerHTML = getBackPageHTML();
+                pageIndicator.textContent = 'Back Page';
+            }
+
+            // Re-render MathJax after updating content
+            if (window.MathJax && window.MathJax.typesetPromise) {
+                MathJax.typesetPromise([pageContent]).catch((e) => console.error(e));
+            }
+        }
+
+        function getFrontPageHTML() {
+            return `
+                <div class="page">
+                    <h1 style="font-weight: bold; text-align: center; padding-bottom: 1px; border-bottom: 1px solid #000;">
+                        Derivatives Formula Sheet - Forwards & Futures
+                    </h1>
+
+                    <div class="section-title">Forward Valuation & Pricing</div>
+                    <table class="formula-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 18%">ID</th>
+                                <th style="width: 25%">Description</th>
+                                <th style="width: 35%">Formula</th>
+                                <th style="width: 22%">Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="formula-id">FWD-VAL-EXPIRY</td>
+                                <td class="desc-cell">Long forward payoff</td>
+                                <td class="math-cell">$V_T^{\\text{long}} = S_T - F(t,T)$</td>
+                                <td class="note-cell">Profit if $S_T > F(t,T)$</td>
+                            </tr>
+                            <tr>
+                                <td class="formula-id">FWD-FAIR-BASIC</td>
+                                <td class="desc-cell">Fair forward (no income)</td>
+                                <td class="math-cell">$F(t,T) = S(t) \\cdot e^{R(t,T) \\cdot (T-t)}$</td>
+                                <td class="note-cell">$= S(t)/D(t,T)$</td>
+                            </tr>
+                            <tr>
+                                <td class="formula-id">FWD-PREPAID</td>
+                                <td class="desc-cell">Prepaid forward</td>
+                                <td class="math-cell">$F_P(t,T) = S(t)$</td>
+                                <td class="note-cell">No income case</td>
+                            </tr>
+                            <tr>
+                                <td class="formula-id">FWD-DIV-1</td>
+                                <td class="desc-cell">With one dividend</td>
+                                <td class="math-cell">$F(t,T) = [S(t) - PV(C_c)] \\cdot e^{R(t,T) \\cdot (T-t)}$</td>
+                                <td class="note-cell">$C_c$ at $T_c < T$</td>
+                            </tr>
+                            <tr>
+                                <td class="formula-id">FWD-DIV-N</td>
+                                <td class="desc-cell">Multiple dividends</td>
+                                <td class="math-cell">$F(t,T) = [S(t) - \\sum PV(D_k)] \\cdot e^{R(t,T) \\cdot (T-t)}$</td>
+                                <td class="note-cell">$F_P = S(t) - \\sum PV(D_k)$</td>
+                            </tr>
+                            <tr>
+                                <td class="formula-id">FWD-CONT-YIELD</td>
+                                <td class="desc-cell">Continuous yield $\\delta$</td>
+                                <td class="math-cell">$F(t,T) = S(t) \\cdot e^{(R(t,T)-\\delta) \\cdot (T-t)}$</td>
+                                <td class="note-cell">Rate minus yield</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="section-title">Special Cases & Relations</div>
+                    <table class="formula-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 18%">ID</th>
+                                <th style="width: 25%">Description</th>
+                                <th style="width: 35%">Formula</th>
+                                <th style="width: 22%">Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="formula-id">FX-FWD</td>
+                                <td class="desc-cell">Currency forward</td>
+                                <td class="math-cell">$F_{X_{d,f}}(t,T) = X_{d,f}(t) \\cdot e^{(R_d - R_f) \\cdot (T-t)}$</td>
+                                <td class="note-cell">Interest rate parity</td>
+                            </tr>
+                            <tr>
+                                <td class="formula-id">FRA-LINK</td>
+                                <td class="desc-cell">Zero/forward consistency</td>
+                                <td class="math-cell">$e^{R(t,T_c)(T_c-t)} \\cdot e^{F(t;T_c,T)(T-T_c)} = e^{R(t,T)(T-t)}$</td>
+                                <td class="note-cell">Rate bootstrapping</td>
+                            </tr>
+                            <tr>
+                                <td class="formula-id">FWD-PREMIUM</td>
+                                <td class="desc-cell">Forward premium</td>
+                                <td class="math-cell">$F(t,T)/S(t) = e^{(R-\\delta) \\cdot (T-t)}$</td>
+                                <td class="note-cell">$>1$ if $R > \\delta$</td>
+                            </tr>
+                            <tr>
+                                <td class="formula-id">FUT-SPOT-PAR</td>
+                                <td class="desc-cell">Futures-spot parity</td>
+                                <td class="math-cell">$F_T = S_T$</td>
+                                <td class="note-cell">At expiry</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="section-title">Hedging Strategies</div>
+                    <table class="formula-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 18%">ID</th>
+                                <th style="width: 25%">Strategy</th>
+                                <th style="width: 35%">Payoff/Value</th>
+                                <th style="width: 22%">Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="formula-id">HEDGE-LONG</td>
+                                <td class="desc-cell">Long hedge P&L</td>
+                                <td class="math-cell">$\\Delta P_{0,T} = -S_T(1-a) + S_0(1-a) \\cdot e^{rT}$</td>
+                                <td class="note-cell">$a$ = hedge ratio</td>
+                            </tr>
+                            <tr>
+                                <td class="formula-id">HEDGE-SHORT</td>
+                                <td class="desc-cell">Short hedge P&L</td>
+                                <td class="math-cell">$\\Delta P_{0,T} = S_T(1-a) - S_0(1-a) \\cdot e^{rT}$</td>
+                                <td class="note-cell">$a=1$ perfect hedge</td>
+                            </tr>
+                            <tr>
+                                <td class="formula-id">BASIS-RISK</td>
+                                <td class="desc-cell">Basis at time $t$</td>
+                                <td class="math-cell">$B(t) = S(t) - F(t,T)$</td>
+                                <td class="note-cell">Converges to 0 at $T$</td>
+                            </tr>
+                            <tr>
+                                <td class="formula-id">HEDGE-RATIO</td>
+                                <td class="desc-cell">Optimal hedge ratio</td>
+                                <td class="math-cell">$h^* = \\rho \\cdot \\frac{\\sigma_S}{\\sigma_F}$</td>
+                                <td class="note-cell">Min variance hedge</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="section-title">Option Payoffs & Profits</div>
+                    <table class="formula-table compact-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 18%">ID</th>
+                                <th style="width: 20%">Position</th>
+                                <th style="width: 28%">Payoff at $T$</th>
+                                <th style="width: 34%">Profit (inc. premium)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="formula-id">CALL-LONG</td>
+                                <td class="desc-cell">Long Call</td>
+                                <td class="math-cell">$c_L(T) = \\max(S_T - K, 0)$</td>
+                                <td class="math-cell">$\\Pi = \\max(S_T - K, 0) - C_t \\cdot e^{r(T-t)}$</td>
+                            </tr>
+                            <tr>
+                                <td class="formula-id">CALL-SHORT</td>
+                                <td class="desc-cell">Short Call</td>
+                                <td class="math-cell">$c_S(T) = -\\max(S_T - K, 0)$</td>
+                                <td class="math-cell">$\\Pi = C_t \\cdot e^{r(T-t)} - \\max(S_T - K, 0)$</td>
+                            </tr>
+                            <tr>
+                                <td class="formula-id">PUT-LONG</td>
+                                <td class="desc-cell">Long Put</td>
+                                <td class="math-cell">$p_L(T) = \\max(K - S_T, 0)$</td>
+                                <td class="math-cell">$\\Pi = \\max(K - S_T, 0) - P_t \\cdot e^{r(T-t)}$</td>
+                            </tr>
+                            <tr>
+                                <td class="formula-id">PUT-SHORT</td>
+                                <td class="desc-cell">Short Put</td>
+                                <td class="math-cell">$p_S(T) = -\\max(K - S_T, 0)$</td>
+                                <td class="math-cell">$\\Pi = P_t \\cdot e^{r(T-t)} - \\max(K - S_T, 0)$</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="section-title">Option Bounds</div>
+                    <table class="formula-table compact-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 20%">Type</th>
+                                <th style="width: 30%">American</th>
+                                <th style="width: 30%">European</th>
+                                <th style="width: 20%">Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="desc-cell">Call Upper</td>
+                                <td class="math-cell">$C(t,T) \\leq S(t)$</td>
+                                <td class="math-cell">$c(t,T) \\leq S(t)$</td>
+                                <td class="note-cell">Stock price cap</td>
+                            </tr>
+                            <tr>
+                                <td class="desc-cell">Call Lower</td>
+                                <td class="math-cell">$C(t,T) \\geq S(t) - K$</td>
+                                <td class="math-cell">$c(t,T) \\geq S(t) - Ke^{-r(T-t)}$</td>
+                                <td class="note-cell">Intrinsic + time</td>
+                            </tr>
+                            <tr>
+                                <td class="desc-cell">Put Upper</td>
+                                <td class="math-cell">$P(t,T) \\leq K$</td>
+                                <td class="math-cell">$p(t,T) \\leq Ke^{-r(T-t)}$</td>
+                                <td class="note-cell">Strike cap</td>
+                            </tr>
+                            <tr>
+                                <td class="desc-cell">Put Lower</td>
+                                <td class="math-cell">$P(t,T) \\geq K - S(t)$</td>
+                                <td class="math-cell">$p(t,T) \\geq Ke^{-r(T-t)} - S(t)$</td>
+                                <td class="note-cell">Intrinsic + time</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="section-title">Key Concepts & Principles</div>
+                    <table class="formula-table compact-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 25%">Concept</th>
+                                <th style="width: 40%">Description</th>
+                                <th style="width: 35%">Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="desc-cell">Parallel Payoffs</td>
+                                <td class="note-cell">If $\\text{Payoff}_A = \\text{Payoff}_B + c$</td>
+                                <td class="note-cell">Then $\\text{Profit}_A = \\text{Profit}_B$</td>
+                            </tr>
+                            <tr>
+                                <td class="desc-cell">Intrinsic Value</td>
+                                <td class="note-cell">Value if exercised NOW</td>
+                                <td class="note-cell">Call: $(S-K)^+$, Put: $(K-S)^+$</td>
+                            </tr>
+                            <tr>
+                                <td class="desc-cell">Time Value</td>
+                                <td class="note-cell">Premium - Intrinsic Value</td>
+                                <td class="note-cell">Always $\\geq 0$</td>
+                            </tr>
+                            <tr>
+                                <td class="desc-cell">Short Hedge</td>
+                                <td class="note-cell">Already own asset</td>
+                                <td class="note-cell">$\\rightarrow$ Short futures</td>
+                            </tr>
+                            <tr>
+                                <td class="desc-cell">Long Hedge</td>
+                                <td class="note-cell">Need to buy asset</td>
+                                <td class="note-cell">$\\rightarrow$ Long futures</td>
+                            </tr>
+                            <tr>
+                                <td class="desc-cell">Cash-and-Carry</td>
+                                <td class="note-cell">When $F_{\\text{obs}} > F_{\\text{fair}}$</td>
+                                <td class="note-cell">Buy asset, borrow, short forward</td>
+                            </tr>
+                            <tr>
+                                <td class="desc-cell">Reverse C&C</td>
+                                <td class="note-cell">When $F_{\\text{obs}} < F_{\\text{fair}}$</td>
+                                <td class="note-cell">Short asset, lend, long forward</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+
+                </div>
+            `;
+        }
+
+        function getBackPageHTML() {
+            return `
+                <div class="page">
+                    <h1 style="font-weight: bold; text-align: center; padding-bottom: 1px; border-bottom: 1px solid #000;">
+                        Options Pricing & Strategies
+                    </h1>
+
+                    <div class="section-title">Put-Call Parity</div>
+                    <table class="formula-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 18%">ID</th>
+                                <th style="width: 25%">Case</th>
+                                <th style="width: 40%">Formula</th>
+                                <th style="width: 17%">Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="formula-id">PCP-BASE</td>
+                                <td class="desc-cell">No dividends</td>
+                                <td class="math-cell">$c(t,T) + Ke^{-r(T-t)} = p(t,T) + S(t)$</td>
+                                <td class="note-cell">European</td>
+                            </tr>
+                            <tr>
+                                <td class="formula-id">PCP-DIV-1</td>
+                                <td class="desc-cell">One dividend</td>
+                                <td class="math-cell">$c_t - p_t = S_t - D \\cdot e^{-r(t_d-t)} - Ke^{-r(T-t)}$</td>
+                                <td class="note-cell">$D$ at $t_d$</td>
+                            </tr>
+                            <tr>
+                                <td class="formula-id">PCP-DIV-N</td>
+                                <td class="desc-cell">Multiple divs</td>
+                                <td class="math-cell">$c_t - p_t = S_t - \\sum_i D_i e^{-r(t_i-t)} - Ke^{-r(T-t)}$</td>
+                                <td class="note-cell">$n$ dividends</td>
+                            </tr>
+                            <tr>
+                                <td class="formula-id">PCP-AMER</td>
+                                <td class="desc-cell">American bounds</td>
+                                <td class="math-cell">$S - K \\leq C - P \\leq S - Ke^{-r(T-t)}$</td>
+                                <td class="note-cell">No dividends</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+
+                    <div class="section-title">Common Option Strategies</div>
+                    <table class="formula-table compact-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 20%">Strategy</th>
+                                <th style="width: 35%">Components</th>
+                                <th style="width: 30%">Max Profit</th>
+                                <th style="width: 15%">Max Loss</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="desc-cell">Covered Call</td>
+                                <td class="note-cell">Long stock + Short call</td>
+                                <td class="math-cell">$K - S_0 + C$</td>
+                                <td class="math-cell">$S_0 - C$</td>
+                            </tr>
+                            <tr>
+                                <td class="desc-cell">Protective Put</td>
+                                <td class="note-cell">Long stock + Long put</td>
+                                <td class="math-cell">Unlimited</td>
+                                <td class="math-cell">$S_0 + P - K$</td>
+                            </tr>
+                            <tr>
+                                <td class="desc-cell">Bull Call Spread</td>
+                                <td class="note-cell">Long $K_1$ call + Short $K_2$ call</td>
+                                <td class="math-cell">$K_2 - K_1 - \\text{net debit}$</td>
+                                <td class="math-cell">Net debit</td>
+                            </tr>
+                            <tr>
+                                <td class="desc-cell">Bear Put Spread</td>
+                                <td class="note-cell">Long $K_2$ put + Short $K_1$ put</td>
+                                <td class="math-cell">$K_2 - K_1 - \\text{net debit}$</td>
+                                <td class="math-cell">Net debit</td>
+                            </tr>
+                            <tr>
+                                <td class="desc-cell">Long Straddle</td>
+                                <td class="note-cell">Long call + Long put (same $K$)</td>
+                                <td class="math-cell">Unlimited</td>
+                                <td class="math-cell">$C + P$</td>
+                            </tr>
+                            <tr>
+                                <td class="desc-cell">Long Strangle</td>
+                                <td class="note-cell">Long OTM call + Long OTM put</td>
+                                <td class="math-cell">Unlimited</td>
+                                <td class="math-cell">$C + P$</td>
+                            </tr>
+                            <tr>
+                                <td class="desc-cell">Iron Condor</td>
+                                <td class="note-cell">Bull put spread + Bear call spread</td>
+                                <td class="math-cell">Net credit</td>
+                                <td class="math-cell">Width - credit</td>
+                            </tr>
+                            <tr>
+                                <td class="desc-cell">Butterfly</td>
+                                <td class="note-cell">Long $K_1$, Short 2×$K_2$, Long $K_3$</td>
+                                <td class="math-cell">$K_2 - K_1 - \\text{debit}$</td>
+                                <td class="math-cell">Net debit</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="section-title">Volatility & Implied Volatility</div>
+                    <table class="formula-table compact-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 20%">Concept</th>
+                                <th style="width: 45%">Formula/Definition</th>
+                                <th style="width: 35%">Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="desc-cell">Historical Vol</td>
+                                <td class="math-cell">$\\sigma = \\sqrt{\\frac{252}{n}\\sum_{i=1}^n (r_i - \\bar{r})^2}$</td>
+                                <td class="note-cell">Annualized std dev of returns</td>
+                            </tr>
+                            <tr>
+                                <td class="desc-cell">Implied Vol</td>
+                                <td class="math-cell">$C_{\\text{market}} = BS(S, K, r, T, \\sigma_{IV})$</td>
+                                <td class="note-cell">Solve for $\\sigma_{IV}$</td>
+                            </tr>
+                            <tr>
+                                <td class="desc-cell">Vol Smile</td>
+                                <td class="math-cell">IV varies with strike $K$</td>
+                                <td class="note-cell">Higher for OTM options</td>
+                            </tr>
+                            <tr>
+                                <td class="desc-cell">Term Structure</td>
+                                <td class="math-cell">IV varies with expiry $T$</td>
+                                <td class="note-cell">Event risk pricing</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="section-title">Forward Contract Valuation & Relationships</div>
+                    <table class="formula-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 18%">ID</th>
+                                <th style="width: 25%">Description</th>
+                                <th style="width: 35%">Formula</th>
+                                <th style="width: 22%">Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="formula-id">FWD-VALUE</td>
+                                <td class="desc-cell">Forward value at time $t$</td>
+                                <td class="math-cell">$f(t,T) = F(t,T) - K$</td>
+                                <td class="note-cell">$K$ = initial forward price</td>
+                            </tr>
+                            <tr>
+                                <td class="formula-id">FWD-VALUE-PV</td>
+                                <td class="desc-cell">PV of forward value</td>
+                                <td class="math-cell">$f(t,T) = [F(t,T) - K]e^{-r(T-t)}$</td>
+                                <td class="note-cell">Discounted to time $t$</td>
+                            </tr>
+                            <tr>
+                                <td class="formula-id">PREPAID-REL</td>
+                                <td class="desc-cell">Prepaid-Forward link</td>
+                                <td class="math-cell">$F_{0,T} = F^P_{0,T} \\cdot e^{rT}$</td>
+                                <td class="note-cell">$F^P = F \\cdot e^{-rT}$</td>
+                            </tr>
+                            <tr>
+                                <td class="formula-id">CONTANGO</td>
+                                <td class="desc-cell">Contango condition</td>
+                                <td class="math-cell">$F(t,T) > S(t)$</td>
+                                <td class="note-cell">When $r > \\delta$</td>
+                            </tr>
+                            <tr>
+                                <td class="formula-id">BACKWARDATION</td>
+                                <td class="desc-cell">Backwardation condition</td>
+                                <td class="math-cell">$F(t,T) < S(t)$</td>
+                                <td class="note-cell">When $\\delta > r$</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="section-title">Futures Mechanics</div>
+                    <table class="formula-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 18%">ID</th>
+                                <th style="width: 25%">Description</th>
+                                <th style="width: 35%">Formula</th>
+                                <th style="width: 22%">Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="formula-id">MTM-PROCEED</td>
+                                <td class="desc-cell">Mark-to-market proceed</td>
+                                <td class="math-cell">$D_t = \\text{Mult} \\times (F_{t,n} - F_{t-1,n})$</td>
+                                <td class="note-cell">Daily settlement</td>
+                            </tr>
+                            <tr>
+                                <td class="formula-id">MARGIN-BAL</td>
+                                <td class="desc-cell">Margin balance</td>
+                                <td class="math-cell">$B_t = B_{t-1}e^{r/365} + D_t$</td>
+                                <td class="note-cell">With interest</td>
+                            </tr>
+                            <tr>
+                                <td class="formula-id">INIT-MARGIN</td>
+                                <td class="desc-cell">Initial margin</td>
+                                <td class="math-cell">$B_0 = \\text{Margin\\%} \\times \\text{Mult} \\times F_{0,n}$</td>
+                                <td class="note-cell">Typically 10%</td>
+                            </tr>
+                            <tr>
+                                <td class="formula-id">MAINT-MARGIN</td>
+                                <td class="desc-cell">Maintenance margin</td>
+                                <td class="math-cell">$M_{\\text{maint}} = k \\times B_0$</td>
+                                <td class="note-cell">$k$ = 70-90%</td>
+                            </tr>
+                            <tr>
+                                <td class="formula-id">MARGIN-CALL</td>
+                                <td class="desc-cell">Margin call trigger</td>
+                                <td class="math-cell">$B_t < M_{\\text{maint}}$</td>
+                                <td class="note-cell">Must restore to $B_0$</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="section-title">Synthetic Positions</div>
+                    <table class="formula-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 18%">ID</th>
+                                <th style="width: 30%">Synthetic Position</th>
+                                <th style="width: 35%">Construction</th>
+                                <th style="width: 17%">Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="formula-id">SYN-FWD-L</td>
+                                <td class="desc-cell">Synthetic long forward</td>
+                                <td class="math-cell">Long Call + Short Put</td>
+                                <td class="note-cell">Same $K$, $T$</td>
+                            </tr>
+                            <tr>
+                                <td class="formula-id">SYN-FWD-S</td>
+                                <td class="desc-cell">Synthetic short forward</td>
+                                <td class="math-cell">Short Call + Long Put</td>
+                                <td class="note-cell">Same $K$, $T$</td>
+                            </tr>
+                            <tr>
+                                <td class="formula-id">SYN-CALL</td>
+                                <td class="desc-cell">Synthetic call</td>
+                                <td class="math-cell">Long Stock + Long Put - Borrow $PV(K)$</td>
+                                <td class="note-cell">From PCP</td>
+                            </tr>
+                            <tr>
+                                <td class="formula-id">SYN-PUT</td>
+                                <td class="desc-cell">Synthetic put</td>
+                                <td class="math-cell">Short Stock + Long Call + Lend $PV(K)$</td>
+                                <td class="note-cell">From PCP</td>
+                            </tr>
+                            <tr>
+                                <td class="formula-id">SYN-STOCK</td>
+                                <td class="desc-cell">Synthetic long stock</td>
+                                <td class="math-cell">Long Call + Short Put + $PV(K)$</td>
+                                <td class="note-cell">Borrow $PV(K)$</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="section-title">Put-Call Parity Rearrangements</div>
+                    <table class="formula-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 18%">ID</th>
+                                <th style="width: 25%">Create</th>
+                                <th style="width: 40%">Formula</th>
+                                <th style="width: 17%">Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="formula-id">PCP-CREATE-C</td>
+                                <td class="desc-cell">Create call from put</td>
+                                <td class="math-cell">$C = P + S - Ke^{-rT}$</td>
+                                <td class="note-cell">European</td>
+                            </tr>
+                            <tr>
+                                <td class="formula-id">PCP-CREATE-P</td>
+                                <td class="desc-cell">Create put from call</td>
+                                <td class="math-cell">$P = C - S + Ke^{-rT}$</td>
+                                <td class="note-cell">European</td>
+                            </tr>
+                            <tr>
+                                <td class="formula-id">PCP-CREATE-S</td>
+                                <td class="desc-cell">Create stock</td>
+                                <td class="math-cell">$S = C - P + Ke^{-rT}$</td>
+                                <td class="note-cell">Synthetic stock</td>
+                            </tr>
+                            <tr>
+                                <td class="formula-id">PCP-ZERO-COST</td>
+                                <td class="desc-cell">Zero-cost condition</td>
+                                <td class="math-cell">$C = P$ when $K = F_{0,T}$</td>
+                                <td class="note-cell">Forward = strike</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="section-title">Covered & Insurance Positions</div>
+                    <table class="formula-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 18%">ID</th>
+                                <th style="width: 25%">Strategy</th>
+                                <th style="width: 30%">Payoff</th>
+                                <th style="width: 27%">Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="formula-id">COV-CALL</td>
+                                <td class="desc-cell">Covered call</td>
+                                <td class="math-cell">$\\min(S_T, K)$</td>
+                                <td class="note-cell">Long stock + short call</td>
+                            </tr>
+                            <tr>
+                                <td class="formula-id">FLOOR</td>
+                                <td class="desc-cell">Floor (protective put)</td>
+                                <td class="math-cell">$\\max(S_T, K)$</td>
+                                <td class="note-cell">Long stock + long put</td>
+                            </tr>
+                            <tr>
+                                <td class="formula-id">CAP</td>
+                                <td class="desc-cell">Cap</td>
+                                <td class="math-cell">$-\\min(S_T, K)$</td>
+                                <td class="note-cell">Short stock + long call</td>
+                            </tr>
+                            <tr>
+                                <td class="formula-id">COV-PUT</td>
+                                <td class="desc-cell">Covered put</td>
+                                <td class="math-cell">$-\\max(S_T, K)$</td>
+                                <td class="note-cell">Short stock + short put</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="section-title">Detailed Strategy Payoffs</div>
+                    <table class="formula-table compact-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 18%">ID</th>
+                                <th style="width: 20%">Strategy</th>
+                                <th style="width: 35%">Payoff Formula</th>
+                                <th style="width: 27%">Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="formula-id">BULL-SPREAD</td>
+                                <td class="desc-cell">Bull call spread</td>
+                                <td class="math-cell">$\\max(0, \\min(S_T - K_1, K_2 - K_1))$</td>
+                                <td class="note-cell">$K_1 < K_2$</td>
+                            </tr>
+                            <tr>
+                                <td class="formula-id">BEAR-SPREAD</td>
+                                <td class="desc-cell">Bear put spread</td>
+                                <td class="math-cell">$\\max(0, \\min(K_2 - S_T, K_2 - K_1))$</td>
+                                <td class="note-cell">$K_1 < K_2$</td>
+                            </tr>
+                            <tr>
+                                <td class="formula-id">STRADDLE</td>
+                                <td class="desc-cell">Long straddle</td>
+                                <td class="math-cell">$|S_T - K|$</td>
+                                <td class="note-cell">$= (S_T - K)^+ + (K - S_T)^+$</td>
+                            </tr>
+                            <tr>
+                                <td class="formula-id">STRANGLE</td>
+                                <td class="desc-cell">Long strangle</td>
+                                <td class="math-cell">$(S_T - K_2)^+ + (K_1 - S_T)^+$</td>
+                                <td class="note-cell">$K_1 < K_2$, both OTM</td>
+                            </tr>
+                            <tr>
+                                <td class="formula-id">BUTTERFLY</td>
+                                <td class="desc-cell">Long butterfly</td>
+                                <td class="math-cell">$\\max(0, \\min(S_T - K_1, K_3 - S_T))$</td>
+                                <td class="note-cell">$K_2 = (K_1 + K_3)/2$</td>
+                            </tr>
+                            <tr>
+                                <td class="formula-id">COLLAR</td>
+                                <td class="desc-cell">Long collar</td>
+                                <td class="math-cell">$\\max(\\min(S_T, K_2), K_1)$</td>
+                                <td class="note-cell">Short $K_2$ call + long $K_1$ put</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="section-title">Hedging Formulas</div>
+                    <table class="formula-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 18%">ID</th>
+                                <th style="width: 25%">Description</th>
+                                <th style="width: 35%">Formula</th>
+                                <th style="width: 22%">Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="formula-id">NUM-CONTRACTS</td>
+                                <td class="desc-cell">Optimal contracts</td>
+                                <td class="math-cell">$N^* = \\beta \\times \\frac{P}{V_S}$</td>
+                                <td class="note-cell">$P$ = portfolio value</td>
+                            </tr>
+                            <tr>
+                                <td class="formula-id">INDEX-HEDGE</td>
+                                <td class="desc-cell">Index futures hedge</td>
+                                <td class="math-cell">$N^* = \\beta \\times \\frac{P}{250 \\times F}$</td>
+                                <td class="note-cell">$F$ = index level</td>
+                            </tr>
+                            <tr>
+                                <td class="formula-id">TAILING</td>
+                                <td class="desc-cell">Tailing position</td>
+                                <td class="math-cell">Buy $e^{-\\delta T}$ shares</td>
+                                <td class="note-cell">Adjusts for dividends</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+
+
+                </div>
+            `;
+        }
+
+        // Initialize when DOM is ready
+        document.addEventListener('DOMContentLoaded', function() {
+            applyCSSVariables();
+            renderPage();
+        });
+
+        // Also apply immediately if document is already loaded
+        if (document.readyState === 'complete' || document.readyState === 'interactive') {
+            applyCSSVariables();
+            // Wait for MathJax to load before initial render
+            if (!window.MathJax) {
+                // If MathJax isn't ready yet, render without it first
+                renderPage();
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Forward Contract Solver - Derivatives Course</title>
+    <link rel="stylesheet" href="../styles.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.11.0/math.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="main-header">
+            <h1>Forward Contract Solver</h1>
+            <p>Comprehensive solver for forward contracts with dividends and forward interest rates</p>
+            
+            <div class="nav-tabs">
+                <a href="../index.html" class="nav-tab">Study Materials</a>
+                <a href="../problem-sets.html" class="nav-tab">Problem Sets</a>
+                <a href="../solvers.html" class="nav-tab active">Solvers</a>
+                <a href="../formulas.html" class="nav-tab">Formulas</a>
+            </div>
+        </div>
+
+        <a href="../solvers.html" class="back-to-main">← Back to Solvers</a>
+
+        <!-- Mode Selection -->
+        <div class="calculator-section">
+            <h2>Select Calculation Mode</h2>
+            <div class="mode-selector">
+                <button class="mode-btn active" onclick="switchMode('dividend')">
+                    Forward Price with Dividends
+                </button>
+                <button class="mode-btn" onclick="switchMode('rate')">
+                    Forward Interest Rate
+                </button>
+                <button class="mode-btn" onclick="switchMode('example')">
+                    Example Problem Solver
+                </button>
+            </div>
+        </div>
+
+        <!-- Mode 1: Forward Price with Dividends -->
+        <div id="dividend-mode" class="calculation-mode">
+            <div class="calculator">
+                <h2>Forward Contract on Dividend-Paying Stock</h2>
+                
+                <div class="formula-box">
+                    <h3>Formula</h3>
+                    <div class="math">
+                        $$F = (S_0 - PV(\text{Dividends})) \times (1 + r)^T$$
+                    </div>
+                    <p>Where: $$PV(\text{Dividends}) = \sum_{i=1}^{n} \frac{D_i}{(1 + r_i)^{t_i}}$$</p>
+                </div>
+
+                <div class="input-section">
+                    <h3>Stock Information</h3>
+                    <div class="input-group">
+                        <label for="spot-price">Spot Price (S₀)</label>
+                        <input type="number" id="spot-price" placeholder="217.1" step="0.01" value="217.1">
+                    </div>
+
+                    <div class="input-group">
+                        <label for="maturity">Contract Maturity (years)</label>
+                        <input type="number" id="maturity" placeholder="1" step="0.01" value="1">
+                    </div>
+
+                    <div class="input-group">
+                        <label for="compounding">Compounding Method</label>
+                        <select id="compounding">
+                            <option value="discrete">Discrete (Annual)</option>
+                            <option value="continuous">Continuous</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="input-section">
+                    <h3>Dividends</h3>
+                    <div id="dividend-inputs">
+                        <div class="dividend-entry">
+                            <input type="number" placeholder="Amount" class="div-amount" step="0.01">
+                            <input type="number" placeholder="Time (years)" class="div-time" step="0.01">
+                            <button onclick="removeDividend(this)" class="remove-btn">Remove</button>
+                        </div>
+                    </div>
+                    <button onclick="addDividend()" class="add-btn">Add Dividend</button>
+                </div>
+
+                <div class="input-section">
+                    <h3>Interest Rates</h3>
+                    <div class="rate-type-selector">
+                        <label>
+                            <input type="radio" name="rate-type" value="single" checked onchange="updateRateInputs()">
+                            Single Rate for All Periods
+                        </label>
+                        <label>
+                            <input type="radio" name="rate-type" value="multiple" onchange="updateRateInputs()">
+                            Different Rates for Each Period
+                        </label>
+                    </div>
+                    <div id="rate-inputs">
+                        <div class="input-group">
+                            <label for="single-rate">Annual Interest Rate (%)</label>
+                            <input type="number" id="single-rate" placeholder="0.85" step="0.01" value="0.85">
+                        </div>
+                    </div>
+                </div>
+
+                <button onclick="calculateForwardPrice()" class="calculate-btn">Calculate Forward Price</button>
+
+                <div id="dividend-results" class="results-section" style="display: none;">
+                    <h3>Results</h3>
+                    <div class="result-box">
+                        <div class="result-item">
+                            <span class="result-label">Present Value of Dividends:</span>
+                            <span class="result-value" id="pv-dividends"></span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label">Adjusted Spot Price:</span>
+                            <span class="result-value" id="adjusted-spot"></span>
+                        </div>
+                        <div class="result-item highlight">
+                            <span class="result-label">Forward Price:</span>
+                            <span class="result-value" id="forward-price"></span>
+                        </div>
+                    </div>
+                    <div class="calculation-steps" id="calculation-steps"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mode 2: Forward Interest Rate -->
+        <div id="rate-mode" class="calculation-mode" style="display: none;">
+            <div class="calculator">
+                <h2>Forward Interest Rate Calculator</h2>
+                
+                <div class="formula-box">
+                    <h3>Formula (Discrete Compounding)</h3>
+                    <div class="math">
+                        $$F(0, T_1, T_2) = \left[\frac{(1 + r_2)^{T_2}}{(1 + r_1)^{T_1}}\right]^{\frac{1}{T_2 - T_1}} - 1$$
+                    </div>
+                    <h3>Formula (Continuous Compounding)</h3>
+                    <div class="math">
+                        $$f(0, T_1, T_2) = \frac{r_2 T_2 - r_1 T_1}{T_2 - T_1}$$
+                    </div>
+                </div>
+
+                <div class="input-section">
+                    <h3>Rate Information</h3>
+                    <div class="input-group">
+                        <label for="rate-compounding">Compounding Method</label>
+                        <select id="rate-compounding">
+                            <option value="discrete">Discrete (Annual)</option>
+                            <option value="continuous">Continuous</option>
+                        </select>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="t1-period">Start Period T₁ (years)</label>
+                        <input type="number" id="t1-period" placeholder="0.4167" step="0.0001" value="0.4167">
+                        <small>Example: 5 months = 5/12 = 0.4167 years</small>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="t2-period">End Period T₂ (years)</label>
+                        <input type="number" id="t2-period" placeholder="1" step="0.01" value="1">
+                    </div>
+
+                    <div class="input-group">
+                        <label for="r1-rate">Spot Rate to T₁ (% annual)</label>
+                        <input type="number" id="r1-rate" placeholder="0.6" step="0.01" value="0.6">
+                    </div>
+
+                    <div class="input-group">
+                        <label for="r2-rate">Spot Rate to T₂ (% annual)</label>
+                        <input type="number" id="r2-rate" placeholder="0.85" step="0.01" value="0.85">
+                    </div>
+                </div>
+
+                <button onclick="calculateForwardRate()" class="calculate-btn">Calculate Forward Rate</button>
+
+                <div id="rate-results" class="results-section" style="display: none;">
+                    <h3>Results</h3>
+                    <div class="result-box">
+                        <div class="result-item">
+                            <span class="result-label">Period Length:</span>
+                            <span class="result-value" id="period-length"></span>
+                        </div>
+                        <div class="result-item highlight">
+                            <span class="result-label">Forward Rate F(0, T₁, T₂):</span>
+                            <span class="result-value" id="forward-rate"></span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label">Annualized Rate:</span>
+                            <span class="result-value" id="annualized-rate"></span>
+                        </div>
+                    </div>
+                    <div class="calculation-steps" id="rate-calculation-steps"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mode 3: Example Problem -->
+        <div id="example-mode" class="calculation-mode" style="display: none;">
+            <div class="calculator">
+                <h2>Example Problem: Allianz Forward Contract</h2>
+                
+                <div class="problem-statement">
+                    <h3>Problem</h3>
+                    <p>The spot price of an Allianz share is S₀ = €217.1 and in 5 months it is expected to pay €9.5 dividend.</p>
+                    <ul>
+                        <li>(a) What is the fair price for a one year forward contract on this stock assuming that the 5 month interest rate is 0.6% and the one year rate 0.85%?</li>
+                        <li>(b) What is the forward rate F(0, 5m, 1y)?</li>
+                    </ul>
+                </div>
+
+                <button onclick="solveExampleProblem()" class="calculate-btn">Solve Complete Problem</button>
+
+                <div id="example-results" class="results-section" style="display: none;">
+                    <h3>Solution</h3>
+                    
+                    <div class="solution-part">
+                        <h4>Part (a): Forward Contract Price</h4>
+                        <div class="step">
+                            <p><strong>Step 1: Calculate PV of dividend</strong></p>
+                            <div class="math" id="example-pv-calc"></div>
+                        </div>
+                        <div class="step">
+                            <p><strong>Step 2: Calculate adjusted spot price</strong></p>
+                            <div class="math" id="example-adjusted-calc"></div>
+                        </div>
+                        <div class="step">
+                            <p><strong>Step 3: Calculate forward price</strong></p>
+                            <div class="math" id="example-forward-calc"></div>
+                        </div>
+                        <div class="result-box">
+                            <div class="result-item highlight">
+                                <span class="result-label">Forward Contract Price:</span>
+                                <span class="result-value" id="example-forward-price"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="solution-part">
+                        <h4>Part (b): Forward Interest Rate</h4>
+                        <div class="step">
+                            <p><strong>Calculate F(0, 5m, 1y)</strong></p>
+                            <div class="math" id="example-rate-calc"></div>
+                        </div>
+                        <div class="result-box">
+                            <div class="result-item highlight">
+                                <span class="result-label">Forward Rate F(0, 5m, 1y):</span>
+                                <span class="result-value" id="example-forward-rate"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Information Section -->
+        <div class="section">
+            <h2>About Forward Contracts</h2>
+            <p>
+                A forward contract is an agreement to buy or sell an asset at a specified price at a future date. 
+                The forward price is determined using the no-arbitrage principle, accounting for the time value of money 
+                and any cash flows from the underlying asset.
+            </p>
+
+            <h3>Key Concepts</h3>
+            <div class="concept">
+                <h4>Forward Price with Dividends</h4>
+                <p>When a stock pays dividends before the forward contract matures, the forward price must be adjusted by subtracting the present value of those dividends from the spot price.</p>
+            </div>
+
+            <div class="concept">
+                <h4>Forward Interest Rates</h4>
+                <p>A forward interest rate is the rate of interest for a period of time in the future, as implied by current spot rates. It represents the rate you could lock in today for borrowing or lending that starts at a future date.</p>
+            </div>
+
+            <h3>Common Applications</h3>
+            <ul>
+                <li>Hedging future price risk for stocks with known dividend payments</li>
+                <li>Locking in future borrowing or lending rates</li>
+                <li>Arbitrage opportunities when forward prices deviate from theoretical values</li>
+                <li>Corporate treasury management and financial planning</li>
+            </ul>
+        </div>
+    </div>
+
+    <style>
+        .calculator-section {
+            margin: 2rem 0;
+            padding: 2rem;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .mode-selector {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .mode-btn {
+            flex: 1;
+            padding: 1rem;
+            background: #f5f5f5;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 1em;
+        }
+
+        .mode-btn:hover {
+            background: #e8e8e8;
+        }
+
+        .mode-btn.active {
+            background: #e74c3c;
+            color: white;
+            border-color: #e74c3c;
+        }
+
+        .calculation-mode {
+            margin-top: 2rem;
+        }
+
+        .calculator {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .formula-box {
+            background: #f0f8ff;
+            padding: 1.5rem;
+            border-radius: 6px;
+            margin-bottom: 2rem;
+            border-left: 4px solid #2196F3;
+        }
+
+        .formula-box h3 {
+            margin-top: 0;
+            color: #2196F3;
+        }
+
+        .input-section {
+            margin: 2rem 0;
+            padding: 1.5rem;
+            background: #f9f9f9;
+            border-radius: 6px;
+        }
+
+        .input-section h3 {
+            margin-top: 0;
+            margin-bottom: 1rem;
+            color: #333;
+        }
+
+        .input-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+            color: #555;
+        }
+
+        .input-group input,
+        .input-group select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1em;
+        }
+
+        .input-group small {
+            display: block;
+            margin-top: 0.25rem;
+            color: #666;
+            font-style: italic;
+        }
+
+        .dividend-entry {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .dividend-entry input {
+            flex: 1;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .remove-btn {
+            padding: 0.75rem 1rem;
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .add-btn {
+            padding: 0.75rem 1.5rem;
+            background: #28a745;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1em;
+        }
+
+        .calculate-btn {
+            width: 100%;
+            padding: 1rem;
+            background: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .calculate-btn:hover {
+            background: #c0392b;
+        }
+
+        .results-section {
+            margin-top: 2rem;
+        }
+
+        .result-box {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 6px;
+            margin: 1rem 0;
+        }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .result-item:last-child {
+            border-bottom: none;
+        }
+
+        .result-item.highlight {
+            background: #fff3cd;
+            padding: 1rem;
+            border-radius: 4px;
+            margin-top: 1rem;
+            border: 2px solid #ffc107;
+        }
+
+        .result-label {
+            font-weight: bold;
+            color: #555;
+        }
+
+        .result-value {
+            color: #2c3e50;
+            font-weight: 500;
+        }
+
+        .calculation-steps {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+        }
+
+        .step {
+            margin: 1.5rem 0;
+            padding: 1rem;
+            background: #f9f9f9;
+            border-radius: 4px;
+        }
+
+        .problem-statement {
+            background: #fff9e6;
+            padding: 1.5rem;
+            border-radius: 6px;
+            margin-bottom: 2rem;
+            border-left: 4px solid #ffc107;
+        }
+
+        .solution-part {
+            margin: 2rem 0;
+            padding: 1.5rem;
+            background: #f8f9fa;
+            border-radius: 6px;
+        }
+
+        .rate-type-selector {
+            margin: 1rem 0;
+        }
+
+        .rate-type-selector label {
+            display: block;
+            margin: 0.5rem 0;
+            cursor: pointer;
+        }
+
+        .rate-type-selector input[type="radio"] {
+            margin-right: 0.5rem;
+        }
+
+        .concept {
+            margin: 1.5rem 0;
+            padding: 1rem;
+            background: #f9f9f9;
+            border-radius: 6px;
+        }
+
+        .concept h4 {
+            margin-top: 0;
+            color: #e74c3c;
+        }
+
+        .section {
+            margin-top: 3rem;
+            padding: 2rem;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .section ul {
+            margin-left: 2rem;
+            line-height: 1.8;
+        }
+    </style>
+
+    <script>
+        // Initialize KaTeX rendering
+        document.addEventListener("DOMContentLoaded", function() {
+            renderMathInElement(document.body, {
+                delimiters: [
+                    {left: '$$', right: '$$', display: true},
+                    {left: '$', right: '$', display: false},
+                    {left: '\\(', right: '\\)', display: false},
+                    {left: '\\[', right: '\\]', display: true}
+                ],
+                throwOnError: false
+            });
+        });
+
+        function switchMode(mode) {
+            // Hide all modes
+            document.getElementById('dividend-mode').style.display = 'none';
+            document.getElementById('rate-mode').style.display = 'none';
+            document.getElementById('example-mode').style.display = 'none';
+            
+            // Show selected mode
+            document.getElementById(mode + '-mode').style.display = 'block';
+            
+            // Update button states
+            const buttons = document.querySelectorAll('.mode-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+
+        function addDividend() {
+            const container = document.getElementById('dividend-inputs');
+            const entry = document.createElement('div');
+            entry.className = 'dividend-entry';
+            entry.innerHTML = `
+                <input type="number" placeholder="Amount" class="div-amount" step="0.01">
+                <input type="number" placeholder="Time (years)" class="div-time" step="0.01">
+                <button onclick="removeDividend(this)" class="remove-btn">Remove</button>
+            `;
+            container.appendChild(entry);
+        }
+
+        function removeDividend(button) {
+            button.parentElement.remove();
+        }
+
+        function updateRateInputs() {
+            const rateType = document.querySelector('input[name="rate-type"]:checked').value;
+            const container = document.getElementById('rate-inputs');
+            
+            if (rateType === 'single') {
+                container.innerHTML = `
+                    <div class="input-group">
+                        <label for="single-rate">Annual Interest Rate (%)</label>
+                        <input type="number" id="single-rate" placeholder="0.85" step="0.01" value="0.85">
+                    </div>
+                `;
+            } else {
+                // Get current dividends to create rate inputs
+                const divTimes = document.querySelectorAll('.div-time');
+                let html = '';
+                divTimes.forEach((timeInput, index) => {
+                    const time = parseFloat(timeInput.value) || 0;
+                    if (time > 0) {
+                        html += `
+                            <div class="input-group">
+                                <label>Rate for ${time} year period (%)</label>
+                                <input type="number" class="period-rate" data-time="${time}" placeholder="0.6" step="0.01">
+                            </div>
+                        `;
+                    }
+                });
+                html += `
+                    <div class="input-group">
+                        <label>Rate for maturity period (%)</label>
+                        <input type="number" id="maturity-rate" placeholder="0.85" step="0.01">
+                    </div>
+                `;
+                container.innerHTML = html;
+            }
+        }
+
+        function calculateForwardPrice() {
+            // Get inputs
+            const spotPrice = parseFloat(document.getElementById('spot-price').value);
+            const maturity = parseFloat(document.getElementById('maturity').value);
+            const compounding = document.getElementById('compounding').value;
+            
+            // Get dividends
+            const dividends = [];
+            const divEntries = document.querySelectorAll('.dividend-entry');
+            divEntries.forEach(entry => {
+                const amount = parseFloat(entry.querySelector('.div-amount').value);
+                const time = parseFloat(entry.querySelector('.div-time').value);
+                if (amount && time) {
+                    dividends.push({ amount, time });
+                }
+            });
+            
+            // Get rates
+            const rateType = document.querySelector('input[name="rate-type"]:checked').value;
+            let pvDividends = 0;
+            let stepsHtml = '<h4>Calculation Steps</h4>';
+            
+            if (rateType === 'single') {
+                const rate = parseFloat(document.getElementById('single-rate').value) / 100;
+                
+                // Calculate PV of dividends
+                stepsHtml += '<div class="step"><p><strong>Step 1: Calculate PV of Dividends</strong></p>';
+                dividends.forEach((div, i) => {
+                    let pv;
+                    if (compounding === 'continuous') {
+                        pv = div.amount * Math.exp(-rate * div.time);
+                        stepsHtml += `<p>PV(D${i+1}) = ${div.amount} × e^(-${rate} × ${div.time}) = €${pv.toFixed(2)}</p>`;
+                    } else {
+                        pv = div.amount / Math.pow(1 + rate, div.time);
+                        stepsHtml += `<p>PV(D${i+1}) = ${div.amount} / (1 + ${rate})^${div.time} = €${pv.toFixed(2)}</p>`;
+                    }
+                    pvDividends += pv;
+                });
+                stepsHtml += `<p><strong>Total PV of Dividends = €${pvDividends.toFixed(2)}</strong></p></div>`;
+                
+                // Calculate adjusted spot price
+                const adjustedSpot = spotPrice - pvDividends;
+                stepsHtml += `<div class="step"><p><strong>Step 2: Adjusted Spot Price</strong></p>`;
+                stepsHtml += `<p>S₀ - PV(Dividends) = ${spotPrice} - ${pvDividends.toFixed(2)} = €${adjustedSpot.toFixed(2)}</p></div>`;
+                
+                // Calculate forward price
+                let forwardPrice;
+                stepsHtml += `<div class="step"><p><strong>Step 3: Forward Price</strong></p>`;
+                if (compounding === 'continuous') {
+                    forwardPrice = adjustedSpot * Math.exp(rate * maturity);
+                    stepsHtml += `<p>F = ${adjustedSpot.toFixed(2)} × e^(${rate} × ${maturity}) = €${forwardPrice.toFixed(2)}</p>`;
+                } else {
+                    forwardPrice = adjustedSpot * Math.pow(1 + rate, maturity);
+                    stepsHtml += `<p>F = ${adjustedSpot.toFixed(2)} × (1 + ${rate})^${maturity} = €${forwardPrice.toFixed(2)}</p>`;
+                }
+                stepsHtml += '</div>';
+                
+                // Display results
+                document.getElementById('pv-dividends').textContent = `€${pvDividends.toFixed(2)}`;
+                document.getElementById('adjusted-spot').textContent = `€${adjustedSpot.toFixed(2)}`;
+                document.getElementById('forward-price').textContent = `€${forwardPrice.toFixed(2)}`;
+                
+            } else {
+                // Multiple rates - need to implement
+                alert('Multiple rates feature coming soon!');
+                return;
+            }
+            
+            document.getElementById('calculation-steps').innerHTML = stepsHtml;
+            document.getElementById('dividend-results').style.display = 'block';
+            
+            // Re-render math
+            renderMathInElement(document.getElementById('calculation-steps'));
+        }
+
+        function calculateForwardRate() {
+            const compounding = document.getElementById('rate-compounding').value;
+            const t1 = parseFloat(document.getElementById('t1-period').value);
+            const t2 = parseFloat(document.getElementById('t2-period').value);
+            const r1 = parseFloat(document.getElementById('r1-rate').value) / 100;
+            const r2 = parseFloat(document.getElementById('r2-rate').value) / 100;
+            
+            const periodLength = t2 - t1;
+            let forwardRate;
+            let stepsHtml = '<h4>Calculation Steps</h4>';
+            
+            if (compounding === 'continuous') {
+                forwardRate = (r2 * t2 - r1 * t1) / periodLength;
+                stepsHtml += `<div class="step">
+                    <p><strong>Using Continuous Compounding Formula:</strong></p>
+                    <p>f(0, ${t1}, ${t2}) = (${r2} × ${t2} - ${r1} × ${t1}) / (${t2} - ${t1})</p>
+                    <p>= (${(r2 * t2).toFixed(6)} - ${(r1 * t1).toFixed(6)}) / ${periodLength.toFixed(4)}</p>
+                    <p>= ${forwardRate.toFixed(6)} or ${(forwardRate * 100).toFixed(4)}%</p>
+                </div>`;
+            } else {
+                const factor = Math.pow((1 + r2), t2) / Math.pow((1 + r1), t1);
+                forwardRate = Math.pow(factor, 1/periodLength) - 1;
+                stepsHtml += `<div class="step">
+                    <p><strong>Using Discrete Compounding Formula:</strong></p>
+                    <p>F(0, ${t1}, ${t2}) = [(1 + ${r2})^${t2} / (1 + ${r1})^${t1}]^(1/${periodLength.toFixed(4)}) - 1</p>
+                    <p>= [${Math.pow(1 + r2, t2).toFixed(6)} / ${Math.pow(1 + r1, t1).toFixed(6)}]^${(1/periodLength).toFixed(4)} - 1</p>
+                    <p>= ${factor.toFixed(6)}^${(1/periodLength).toFixed(4)} - 1</p>
+                    <p>= ${forwardRate.toFixed(6)} or ${(forwardRate * 100).toFixed(4)}%</p>
+                </div>`;
+            }
+            
+            // Annualized rate (if period is not 1 year)
+            const annualizedRate = periodLength !== 1 ? forwardRate / periodLength : forwardRate;
+            
+            document.getElementById('period-length').textContent = `${periodLength.toFixed(4)} years`;
+            document.getElementById('forward-rate').textContent = `${(forwardRate * 100).toFixed(4)}%`;
+            document.getElementById('annualized-rate').textContent = `${(annualizedRate * 100).toFixed(4)}%`;
+            
+            document.getElementById('rate-calculation-steps').innerHTML = stepsHtml;
+            document.getElementById('rate-results').style.display = 'block';
+            
+            renderMathInElement(document.getElementById('rate-calculation-steps'));
+        }
+
+        function solveExampleProblem() {
+            // Problem parameters
+            const spotPrice = 217.1;
+            const dividend = 9.5;
+            const divTime = 5/12; // 5 months in years
+            const maturity = 1; // 1 year
+            const r5m = 0.006; // 0.6%
+            const r1y = 0.0085; // 0.85%
+            
+            // Part (a): Forward Price
+            const pvDividend = dividend / Math.pow(1 + r5m, divTime);
+            const adjustedSpot = spotPrice - pvDividend;
+            const forwardPrice = adjustedSpot * Math.pow(1 + r1y, maturity);
+            
+            // Part (b): Forward Rate
+            const t1 = divTime;
+            const t2 = maturity;
+            const periodLength = t2 - t1;
+            const factor = Math.pow(1 + r1y, t2) / Math.pow(1 + r5m, t1);
+            const forwardRate = Math.pow(factor, 1/periodLength) - 1;
+            
+            // Display calculations
+            document.getElementById('example-pv-calc').innerHTML = 
+                `PV(Dividend) = \\frac{9.5}{(1 + 0.006)^{5/12}} = \\frac{9.5}{${Math.pow(1.006, divTime).toFixed(6)}} = €${pvDividend.toFixed(2)}`;
+            
+            document.getElementById('example-adjusted-calc').innerHTML = 
+                `S_0 - PV(Dividend) = 217.1 - ${pvDividend.toFixed(2)} = €${adjustedSpot.toFixed(2)}`;
+            
+            document.getElementById('example-forward-calc').innerHTML = 
+                `F = ${adjustedSpot.toFixed(2)} \\times (1 + 0.0085)^1 = ${adjustedSpot.toFixed(2)} \\times ${Math.pow(1.0085, 1).toFixed(6)} = €${forwardPrice.toFixed(2)}`;
+            
+            document.getElementById('example-rate-calc').innerHTML = 
+                `F(0, 5m, 1y) = \\left[\\frac{(1.0085)^1}{(1.006)^{5/12}}\\right]^{\\frac{1}{7/12}} - 1 = ${(forwardRate * 100).toFixed(4)}\\%`;
+            
+            document.getElementById('example-forward-price').textContent = `€${forwardPrice.toFixed(2)}`;
+            document.getElementById('example-forward-rate').textContent = `${(forwardRate * 100).toFixed(4)}%`;
+            
+            document.getElementById('example-results').style.display = 'block';
+            
+            // Re-render math
+            renderMathInElement(document.getElementById('example-results'));
+        }
+
+        // Initialize with one dividend entry
+        window.addEventListener('load', function() {
+            addDividend();
+            // Pre-fill the first dividend with the example values
+            const firstEntry = document.querySelector('.dividend-entry');
+            if (firstEntry) {
+                firstEntry.querySelector('.div-amount').value = '9.5';
+                firstEntry.querySelector('.div-time').value = '0.4167';
+            }
+        });
+    </script>
+</body>
+</html>

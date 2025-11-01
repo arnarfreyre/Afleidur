@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Futures Contract Profit/Loss Calculator - Derivatives Course</title>
+    <link rel="stylesheet" href="../styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+</head>
+<body>
+    <div class="container">
+        <div class="main-header">
+            <h1>Futures Contract Profit/Loss Calculator</h1>
+            <p>Calculate profit or loss for futures contract positions</p>
+            
+            <!-- Navigation tabs -->
+            <div class="nav-tabs">
+                <a href="../index.html" class="nav-tab">Study Materials</a>
+                <a href="../problem-sets.html" class="nav-tab">Problem Sets</a>
+                <a href="../solvers.html" class="nav-tab active">Solvers</a>
+            </div>
+        </div>
+
+        <a href="../solvers.html" class="back-to-main">← Back to Solvers</a>
+
+        <div class="calculator">
+            <h2>Futures P&L Calculator</h2>
+            
+            <div class="input-group">
+                <label for="positionType">Position Type</label>
+                <select id="positionType">
+                    <option value="short">Short (Sell)</option>
+                    <option value="long">Long (Buy)</option>
+                </select>
+            </div>
+
+            <div class="input-group">
+                <label for="contractType">Contract Specification</label>
+                <select id="contractType" onchange="updateContractUnits()">
+                    <option value="commodity">Commodity (per unit price)</option>
+                    <option value="index">Index (points)</option>
+                    <option value="currency">Currency</option>
+                    <option value="custom">Custom</option>
+                </select>
+            </div>
+
+            <div class="input-group">
+                <label for="initialPrice">Initial Futures Price <span id="priceUnit">(per unit)</span></label>
+                <input type="number" id="initialPrice" placeholder="49.5" step="0.01" value="49.5">
+            </div>
+
+            <div class="input-group">
+                <label for="contractSize">Contract Size <span id="sizeUnit">(units)</span></label>
+                <input type="number" id="contractSize" placeholder="50000" step="1" value="50000">
+            </div>
+
+            <div class="input-group">
+                <label for="contractMultiplier">Contract Multiplier <small>(if applicable)</small></label>
+                <input type="number" id="contractMultiplier" placeholder="1" step="0.01" value="1">
+                <small>E.g., for cents to dollars use 0.01, for index futures use point value</small>
+            </div>
+
+            <div class="input-group">
+                <label for="finalPrices">Final Price(s) <small>(comma-separated for multiple scenarios)</small></label>
+                <input type="text" id="finalPrices" placeholder="44.5, 51.55" value="44.5, 51.55">
+                <small>Enter one or more prices separated by commas</small>
+            </div>
+
+            <button onclick="calculateProfitLoss()">Calculate Profit/Loss</button>
+
+            <div id="results" style="margin-top: 2rem; display: none;">
+                <h3>Results</h3>
+                <div id="resultBoxes"></div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Understanding Futures Contracts P&L</h2>
+            
+            <div class="example">
+                <h4>Short Position (Seller)</h4>
+                <div class="math">Profit/Loss = (Initial Price - Final Price) × Contract Size × Multiplier</div>
+                <ul>
+                    <li>Profit when price falls (Final < Initial)</li>
+                    <li>Loss when price rises (Final > Initial)</li>
+                    <li>Obligated to deliver the underlying asset</li>
+                </ul>
+            </div>
+
+            <div class="example">
+                <h4>Long Position (Buyer)</h4>
+                <div class="math">Profit/Loss = (Final Price - Initial Price) × Contract Size × Multiplier</div>
+                <ul>
+                    <li>Profit when price rises (Final > Initial)</li>
+                    <li>Loss when price falls (Final < Initial)</li>
+                    <li>Right to receive the underlying asset</li>
+                </ul>
+            </div>
+
+            <h3>Example: Cotton Futures</h3>
+            <div class="example">
+                <p><strong>Problem:</strong> A trader enters into a short cotton futures contract when the futures price is 49.5 cents per pound. The contract is for 50,000 pounds.</p>
+                
+                <p><strong>Scenario A:</strong> Final price = 44.5 cents/pound</p>
+                <div class="math">
+                    Profit = (49.5 - 44.5) × 50,000 × 0.01 = 5.0 × 50,000 × 0.01 = $2,500
+                </div>
+                
+                <p><strong>Scenario B:</strong> Final price = 51.55 cents/pound</p>
+                <div class="math">
+                    Loss = (49.5 - 51.55) × 50,000 × 0.01 = -2.05 × 50,000 × 0.01 = -$1,025
+                </div>
+            </div>
+
+            <h3>Key Concepts</h3>
+            <div class="example">
+                <h4>Contract Specifications</h4>
+                <ul>
+                    <li><strong>Contract Size:</strong> The quantity of the underlying asset per contract</li>
+                    <li><strong>Price Quote:</strong> How the price is expressed (per unit, per pound, per bushel, etc.)</li>
+                    <li><strong>Multiplier:</strong> Conversion factor to get actual dollar value</li>
+                    <li><strong>Tick Size:</strong> Minimum price movement</li>
+                </ul>
+            </div>
+
+            <div class="example">
+                <h4>Common Futures Contracts</h4>
+                <ul>
+                    <li><strong>Commodities:</strong> Gold, Oil, Wheat, Cotton, Coffee</li>
+                    <li><strong>Financial:</strong> S&P 500, Treasury Bonds, Eurodollar</li>
+                    <li><strong>Currency:</strong> EUR/USD, GBP/USD, JPY/USD</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function updateContractUnits() {
+            const contractType = document.getElementById('contractType').value;
+            const priceUnit = document.getElementById('priceUnit');
+            const sizeUnit = document.getElementById('sizeUnit');
+            const multiplierInput = document.getElementById('contractMultiplier');
+            
+            switch(contractType) {
+                case 'commodity':
+                    priceUnit.textContent = '(per unit)';
+                    sizeUnit.textContent = '(units)';
+                    multiplierInput.value = 0.01; // Default for cents to dollars
+                    break;
+                case 'index':
+                    priceUnit.textContent = '(points)';
+                    sizeUnit.textContent = '(contracts)';
+                    multiplierInput.value = 250; // Default S&P 500 multiplier
+                    break;
+                case 'currency':
+                    priceUnit.textContent = '(exchange rate)';
+                    sizeUnit.textContent = '(units)';
+                    multiplierInput.value = 1;
+                    break;
+                case 'custom':
+                    priceUnit.textContent = '(per unit)';
+                    sizeUnit.textContent = '(units)';
+                    multiplierInput.value = 1;
+                    break;
+            }
+        }
+
+        function calculateProfitLoss() {
+            const positionType = document.getElementById('positionType').value;
+            const initialPrice = parseFloat(document.getElementById('initialPrice').value);
+            const contractSize = parseFloat(document.getElementById('contractSize').value);
+            const multiplier = parseFloat(document.getElementById('contractMultiplier').value) || 1;
+            const finalPricesStr = document.getElementById('finalPrices').value;
+            
+            // Parse final prices
+            const finalPrices = finalPricesStr.split(',').map(p => parseFloat(p.trim()));
+            
+            // Validate inputs
+            if (isNaN(initialPrice) || isNaN(contractSize) || finalPrices.some(isNaN)) {
+                alert('Please enter valid numbers for all fields');
+                return;
+            }
+            
+            // Calculate results for each final price
+            const resultBoxes = document.getElementById('resultBoxes');
+            resultBoxes.innerHTML = '';
+            
+            finalPrices.forEach((finalPrice, index) => {
+                let profitLoss;
+                let formula;
+                let calculation;
+                
+                if (positionType === 'short') {
+                    profitLoss = (initialPrice - finalPrice) * contractSize * multiplier;
+                    formula = 'P/L = (Initial Price - Final Price) × Contract Size × Multiplier';
+                    calculation = `P/L = (${initialPrice} - ${finalPrice}) × ${contractSize.toLocaleString()} × ${multiplier}`;
+                } else {
+                    profitLoss = (finalPrice - initialPrice) * contractSize * multiplier;
+                    formula = 'P/L = (Final Price - Initial Price) × Contract Size × Multiplier';
+                    calculation = `P/L = (${finalPrice} - ${initialPrice}) × ${contractSize.toLocaleString()} × ${multiplier}`;
+                }
+                
+                const isProfit = profitLoss >= 0;
+                const resultClass = isProfit ? 'success-box' : 'error-box';
+                const resultLabel = isProfit ? 'Profit' : 'Loss';
+                
+                const resultBox = document.createElement('div');
+                resultBox.className = resultClass;
+                resultBox.style.marginBottom = '1.5rem';
+                resultBox.innerHTML = `
+                    <h4>Scenario ${String.fromCharCode(65 + index)}: Final Price = ${finalPrice}</h4>
+                    <p><strong>Position:</strong> ${positionType.charAt(0).toUpperCase() + positionType.slice(1)}</p>
+                    <p><strong>Formula:</strong> ${formula}</p>
+                    <p><strong>Calculation:</strong></p>
+                    <div class="math">${calculation} = ${profitLoss >= 0 ? '$' : '-$'}${Math.abs(profitLoss).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</div>
+                    <p><strong>Result:</strong> <span class="highlight">${resultLabel} of ${profitLoss >= 0 ? '$' : '-$'}${Math.abs(profitLoss).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span></p>
+                    <p><strong>Price Movement:</strong> ${((finalPrice - initialPrice) / initialPrice * 100).toFixed(2)}%</p>
+                `;
+                
+                resultBoxes.appendChild(resultBox);
+            });
+            
+            document.getElementById('results').style.display = 'block';
+            
+            // Render math with KaTeX
+            document.querySelectorAll('.math').forEach(element => {
+                if (!element.classList.contains('katex')) {
+                    const text = element.textContent;
+                    element.innerHTML = '';
+                    katex.render(text, element, {
+                        displayMode: true,
+                        throwOnError: false
+                    });
+                }
+            });
+        }
+
+        // Add error-box style if not present
+        const style = document.createElement('style');
+        style.textContent = `
+            .error-box {
+                background-color: #fee;
+                border: 1px solid #fcc;
+                border-left: 4px solid #e74c3c;
+                padding: 1.5em;
+                margin: 1.5em 0;
+                border-radius: 4px;
+            }
+            .error-box h4 {
+                color: #c0392b;
+                margin-top: 0;
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Initialize with default contract type
+        updateContractUnits();
+    </script>
+</body>
+</html>

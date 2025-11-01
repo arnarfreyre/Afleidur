@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Term Structure & Forward Rate Calculator - Derivatives Course</title>
+    <link rel="stylesheet" href="../styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+</head>
+<body>
+    <div class="container">
+        <div class="main-header">
+            <h1>Term Structure & Forward Rate Calculator</h1>
+            <p>Calculate forward rates from spot rates and vice versa</p>
+            
+            <!-- Navigation tabs -->
+            <div class="nav-tabs">
+                <a href="../index.html" class="nav-tab">Study Materials</a>
+                <a href="../problem-sets.html" class="nav-tab">Problem Sets</a>
+                <a href="../solvers.html" class="nav-tab active">Solvers</a>
+            </div>
+        </div>
+
+        <a href="../solvers.html" class="back-to-main">← Back to Solvers</a>
+
+        <!-- Calculator Mode Selection -->
+        <div class="calculator">
+            <h2>Calculation Mode</h2>
+            <div class="input-group">
+                <label for="calcMode">Select Calculation Type</label>
+                <select id="calcMode" onchange="switchMode()">
+                    <option value="spotToForward">Spot Rates → Forward Rates</option>
+                    <option value="forwardToSpot">Forward Rates → Spot Rates</option>
+                </select>
+            </div>
+
+            <!-- Spot to Forward Calculator -->
+            <div id="spotToForwardCalc" class="calc-section">
+                <h3>Spot Rates to Forward Rates</h3>
+                
+                <div class="input-group">
+                    <label>Number of Periods</label>
+                    <input type="number" id="numPeriods" value="5" min="2" max="10" onchange="updateRateInputs()">
+                </div>
+
+                <div id="spotRateInputs"></div>
+
+                <button onclick="loadFrenchExample()" class="example-btn">Load French Bond Example</button>
+                <button onclick="calculateForwardRates()" class="calculate-btn">Calculate Forward Rates</button>
+            </div>
+
+            <!-- Forward to Spot Calculator -->
+            <div id="forwardToSpotCalc" class="calc-section" style="display: none;">
+                <h3>Forward Rates to Spot Rates</h3>
+                
+                <div class="input-group">
+                    <label>Number of Forward Periods</label>
+                    <input type="number" id="numForwardPeriods" value="4" min="1" max="10" onchange="updateForwardInputs()">
+                </div>
+
+                <div class="input-group">
+                    <label for="initialSpotRate">Initial Spot Rate (1st period) %</label>
+                    <input type="number" id="initialSpotRate" placeholder="0.5" step="0.01" value="0.5">
+                </div>
+
+                <div id="forwardRateInputs"></div>
+
+                <button onclick="calculateSpotRates()" class="calculate-btn">Calculate Spot Rates</button>
+            </div>
+
+            <!-- Results Section -->
+            <div id="results" style="margin-top: 2rem; display: none;">
+                <h3>Results</h3>
+                <div class="success-box">
+                    <div id="resultTable"></div>
+                    <div id="formulaExplanation" class="math-explanation"></div>
+                    <div id="calculationSteps" class="calculation-steps"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Theory Section -->
+        <div class="section">
+            <h2>About Term Structure and Forward Rates</h2>
+            <p>
+                The term structure of interest rates shows the relationship between spot rates and time to maturity. 
+                Forward rates are implied future rates that can be calculated from current spot rates using no-arbitrage principles.
+            </p>
+            
+            <h3>Key Formulas</h3>
+            
+            <div class="example">
+                <h4>Spot Rate to Forward Rate</h4>
+                <div class="math">f(t₁,t₂) = \left[\frac{(1 + r_{t₂})^{t₂}}{(1 + r_{t₁})^{t₁}}\right]^{\frac{1}{t₂-t₁}} - 1</div>
+                <p>Where f(t₁,t₂) is the forward rate from time t₁ to t₂, and r is the spot rate</p>
+            </div>
+
+            <div class="example">
+                <h4>Forward Rate to Spot Rate</h4>
+                <div class="math">(1 + r_n)^n = (1 + r_1) \times (1 + f_{1,2}) \times (1 + f_{2,3}) \times ... \times (1 + f_{n-1,n})</div>
+                <p>Spot rates can be built up by compounding forward rates</p>
+            </div>
+
+            <div class="example">
+                <h4>Example: French Government Bonds</h4>
+                <p>Given the spot rates from the French bond market:</p>
+                <ul>
+                    <li>10Y: 0.14%</li>
+                    <li>15Y: 0.43%</li>
+                    <li>20Y: 0.63%</li>
+                </ul>
+                <p>We can calculate:</p>
+                <ul>
+                    <li>Forward rate 10Y to 20Y: <span class="math">f(10,20) = \left[\frac{(1.0063)^{20}}{(1.0014)^{10}}\right]^{0.1} - 1 = 1.13\%</span></li>
+                    <li>Forward rate 15Y to 20Y: <span class="math">f(15,20) = \left[\frac{(1.0063)^{20}}{(1.0043)^{15}}\right]^{0.2} - 1 = 1.03\%</span></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .calc-section {
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+
+        .rate-input-row {
+            display: grid;
+            grid-template-columns: 1fr 2fr 2fr;
+            gap: 15px;
+            margin-bottom: 10px;
+            align-items: center;
+        }
+
+        .rate-input-row label {
+            font-weight: 600;
+            color: #555;
+        }
+
+        .rate-input-row input {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .calculate-btn {
+            background: #4CAF50;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 15px;
+            margin-right: 10px;
+        }
+
+        .calculate-btn:hover {
+            background: #45a049;
+        }
+
+        .example-btn {
+            background: #2196F3;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 15px;
+            margin-right: 10px;
+        }
+
+        .example-btn:hover {
+            background: #1976D2;
+        }
+
+        .result-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .result-table th, .result-table td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: center;
+        }
+
+        .result-table th {
+            background: #f0f0f0;
+            font-weight: 600;
+        }
+
+        .math-explanation {
+            margin-top: 20px;
+            padding: 15px;
+            background: #fff;
+            border-left: 4px solid #4CAF50;
+        }
+
+        .calculation-steps {
+            margin-top: 15px;
+            padding: 15px;
+            background: #f9f9f9;
+            border-radius: 4px;
+        }
+
+        .calculation-steps h4 {
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .step {
+            margin: 10px 0;
+            padding: 10px;
+            background: white;
+            border-left: 3px solid #2196F3;
+        }
+    </style>
+
+    <script>
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            updateRateInputs();
+            updateForwardInputs();
+        });
+
+        function switchMode() {
+            const mode = document.getElementById('calcMode').value;
+            const spotToForward = document.getElementById('spotToForwardCalc');
+            const forwardToSpot = document.getElementById('forwardToSpotCalc');
+            
+            if (mode === 'spotToForward') {
+                spotToForward.style.display = 'block';
+                forwardToSpot.style.display = 'none';
+            } else {
+                spotToForward.style.display = 'none';
+                forwardToSpot.style.display = 'block';
+            }
+            
+            // Hide results when switching modes
+            document.getElementById('results').style.display = 'none';
+        }
+
+        function updateRateInputs() {
+            const numPeriods = parseInt(document.getElementById('numPeriods').value);
+            const container = document.getElementById('spotRateInputs');
+            let html = '<h4>Enter Spot Rates</h4>';
+            
+            for (let i = 1; i <= numPeriods; i++) {
+                const years = i * 5; // Default to 5-year intervals
+                html += `
+                    <div class="rate-input-row">
+                        <label>Period ${i}:</label>
+                        <input type="number" id="spotTime${i}" placeholder="Years" step="1" value="${years}">
+                        <input type="number" id="spotRate${i}" placeholder="Rate %" step="0.01">
+                    </div>
+                `;
+            }
+            
+            container.innerHTML = html;
+        }
+
+        function updateForwardInputs() {
+            const numPeriods = parseInt(document.getElementById('numForwardPeriods').value);
+            const container = document.getElementById('forwardRateInputs');
+            let html = '<h4>Enter Forward Rates (period to period)</h4>';
+            
+            for (let i = 1; i <= numPeriods; i++) {
+                html += `
+                    <div class="rate-input-row">
+                        <label>f(${i},${i+1}):</label>
+                        <input type="number" id="forwardLength${i}" placeholder="Period length" step="1" value="1">
+                        <input type="number" id="forwardRate${i}" placeholder="Forward Rate %" step="0.01">
+                    </div>
+                `;
+            }
+            
+            container.innerHTML = html;
+        }
+
+        function loadFrenchExample() {
+            // Set number of periods
+            document.getElementById('numPeriods').value = 5;
+            updateRateInputs();
+            
+            // French bond data
+            const frenchData = [
+                {time: 10, rate: 0.14},
+                {time: 15, rate: 0.43},
+                {time: 20, rate: 0.63},
+                {time: 25, rate: 0.73},
+                {time: 50, rate: 1.04}
+            ];
+            
+            // Fill in the values
+            for (let i = 0; i < frenchData.length; i++) {
+                document.getElementById(`spotTime${i+1}`).value = frenchData[i].time;
+                document.getElementById(`spotRate${i+1}`).value = frenchData[i].rate;
+            }
+        }
+
+        function calculateForwardRates() {
+            const numPeriods = parseInt(document.getElementById('numPeriods').value);
+            const spotRates = [];
+            
+            // Collect spot rates
+            for (let i = 1; i <= numPeriods; i++) {
+                const time = parseFloat(document.getElementById(`spotTime${i}`).value);
+                const rate = parseFloat(document.getElementById(`spotRate${i}`).value) / 100;
+                
+                if (isNaN(time) || isNaN(rate)) {
+                    alert(`Please enter valid values for period ${i}`);
+                    return;
+                }
+                
+                spotRates.push({time, rate});
+            }
+            
+            // Sort by time
+            spotRates.sort((a, b) => a.time - b.time);
+            
+            // Calculate forward rates
+            const forwardRates = [];
+            for (let i = 0; i < spotRates.length - 1; i++) {
+                const t1 = spotRates[i].time;
+                const t2 = spotRates[i + 1].time;
+                const r1 = spotRates[i].rate;
+                const r2 = spotRates[i + 1].rate;
+                
+                // Forward rate formula: f = [(1+r2)^t2 / (1+r1)^t1]^(1/(t2-t1)) - 1
+                const forward = Math.pow(
+                    Math.pow(1 + r2, t2) / Math.pow(1 + r1, t1),
+                    1 / (t2 - t1)
+                ) - 1;
+                
+                forwardRates.push({
+                    from: t1,
+                    to: t2,
+                    rate: forward * 100
+                });
+            }
+            
+            // Display results
+            displayForwardResults(spotRates, forwardRates);
+        }
+
+        function calculateSpotRates() {
+            const numPeriods = parseInt(document.getElementById('numForwardPeriods').value);
+            const initialRate = parseFloat(document.getElementById('initialSpotRate').value) / 100;
+            
+            if (isNaN(initialRate)) {
+                alert('Please enter a valid initial spot rate');
+                return;
+            }
+            
+            const forwardRates = [];
+            let currentTime = 1; // Start with 1-year spot rate
+            
+            // Collect forward rates
+            for (let i = 1; i <= numPeriods; i++) {
+                const length = parseFloat(document.getElementById(`forwardLength${i}`).value);
+                const rate = parseFloat(document.getElementById(`forwardRate${i}`).value) / 100;
+                
+                if (isNaN(length) || isNaN(rate)) {
+                    alert(`Please enter valid values for forward rate ${i}`);
+                    return;
+                }
+                
+                forwardRates.push({
+                    from: currentTime,
+                    to: currentTime + length,
+                    length,
+                    rate
+                });
+                currentTime += length;
+            }
+            
+            // Calculate spot rates by compounding
+            const spotRates = [{time: 1, rate: initialRate}];
+            let compoundedValue = 1 + initialRate;
+            let totalTime = 1;
+            
+            for (let i = 0; i < forwardRates.length; i++) {
+                const forward = forwardRates[i];
+                totalTime += forward.length;
+                
+                // Compound the forward rate
+                compoundedValue *= Math.pow(1 + forward.rate, forward.length);
+                
+                // Calculate equivalent spot rate
+                const spotRate = Math.pow(compoundedValue, 1 / totalTime) - 1;
+                spotRates.push({
+                    time: totalTime,
+                    rate: spotRate
+                });
+            }
+            
+            // Display results
+            displaySpotResults(forwardRates, spotRates, initialRate);
+        }
+
+        function displayForwardResults(spotRates, forwardRates) {
+            const resultsDiv = document.getElementById('results');
+            const tableDiv = document.getElementById('resultTable');
+            const formulaDiv = document.getElementById('formulaExplanation');
+            const stepsDiv = document.getElementById('calculationSteps');
+            
+            // Create results table
+            let tableHTML = `
+                <table class="result-table">
+                    <thead>
+                        <tr>
+                            <th>Period</th>
+                            <th>From (Years)</th>
+                            <th>To (Years)</th>
+                            <th>Forward Rate</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+            
+            forwardRates.forEach((rate, i) => {
+                tableHTML += `
+                    <tr>
+                        <td>f(${rate.from},${rate.to})</td>
+                        <td>${rate.from}</td>
+                        <td>${rate.to}</td>
+                        <td>${rate.rate.toFixed(4)}%</td>
+                    </tr>
+                `;
+            });
+            
+            tableHTML += '</tbody></table>';
+            tableDiv.innerHTML = tableHTML;
+            
+            // Formula explanation
+            formulaDiv.innerHTML = `
+                <h4>Formula Used</h4>
+                <div class="math">f(t_1,t_2) = \\left[\\frac{(1 + r_{t_2})^{t_2}}{(1 + r_{t_1})^{t_1}}\\right]^{\\frac{1}{t_2-t_1}} - 1</div>
+            `;
+            
+            // Calculation steps for first forward rate
+            if (forwardRates.length > 0) {
+                const first = forwardRates[0];
+                const s1 = spotRates[0];
+                const s2 = spotRates[1];
+                
+                stepsDiv.innerHTML = `
+                    <h4>Example Calculation: f(${first.from},${first.to})</h4>
+                    <div class="step">
+                        <strong>Step 1:</strong> Identify spot rates<br>
+                        r(${s1.time}) = ${(s1.rate * 100).toFixed(4)}%<br>
+                        r(${s2.time}) = ${(s2.rate * 100).toFixed(4)}%
+                    </div>
+                    <div class="step">
+                        <strong>Step 2:</strong> Apply formula<br>
+                        f(${first.from},${first.to}) = [(1 + ${(s2.rate).toFixed(6)})^${s2.time} / (1 + ${(s1.rate).toFixed(6)})^${s1.time}]^(1/${s2.time - s1.time}) - 1
+                    </div>
+                    <div class="step">
+                        <strong>Step 3:</strong> Calculate<br>
+                        f(${first.from},${first.to}) = ${first.rate.toFixed(4)}%
+                    </div>
+                `;
+            }
+            
+            // Render math
+            renderMathInElement(formulaDiv);
+            
+            resultsDiv.style.display = 'block';
+        }
+
+        function displaySpotResults(forwardRates, spotRates, initialRate) {
+            const resultsDiv = document.getElementById('results');
+            const tableDiv = document.getElementById('resultTable');
+            const formulaDiv = document.getElementById('formulaExplanation');
+            const stepsDiv = document.getElementById('calculationSteps');
+            
+            // Create results table
+            let tableHTML = `
+                <table class="result-table">
+                    <thead>
+                        <tr>
+                            <th>Time (Years)</th>
+                            <th>Spot Rate</th>
+                            <th>Derived From</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+            
+            spotRates.forEach((rate, i) => {
+                const source = i === 0 ? 'Initial' : `Compounded forwards`;
+                tableHTML += `
+                    <tr>
+                        <td>${rate.time}</td>
+                        <td>${(rate.rate * 100).toFixed(4)}%</td>
+                        <td>${source}</td>
+                    </tr>
+                `;
+            });
+            
+            tableHTML += '</tbody></table>';
+            tableDiv.innerHTML = tableHTML;
+            
+            // Formula explanation
+            formulaDiv.innerHTML = `
+                <h4>Formula Used</h4>
+                <div class="math">(1 + r_n)^n = (1 + r_1) \\times \\prod_{i=1}^{n-1} (1 + f_{i,i+1})^{\\Delta t_i}</div>
+                <p>Where r_n is the n-period spot rate and f_{i,i+1} are forward rates</p>
+            `;
+            
+            // Calculation steps
+            let stepsHTML = '<h4>Calculation Steps</h4>';
+            stepsHTML += `
+                <div class="step">
+                    <strong>Initial spot rate:</strong> r(1) = ${(initialRate * 100).toFixed(4)}%
+                </div>
+            `;
+            
+            let compoundText = `(1 + ${initialRate.toFixed(4)})`;
+            forwardRates.forEach((forward, i) => {
+                compoundText += ` × (1 + ${forward.rate.toFixed(4)})^${forward.length}`;
+                const spotRate = spotRates[i + 1];
+                stepsHTML += `
+                    <div class="step">
+                        <strong>Period ${i + 2}:</strong><br>
+                        Compound forward f(${forward.from},${forward.to}) = ${(forward.rate * 100).toFixed(4)}%<br>
+                        Resulting spot r(${spotRate.time}) = ${(spotRate.rate * 100).toFixed(4)}%
+                    </div>
+                `;
+            });
+            
+            stepsDiv.innerHTML = stepsHTML;
+            
+            // Render math
+            renderMathInElement(formulaDiv);
+            
+            resultsDiv.style.display = 'block';
+        }
+
+        function renderMathInElement(element) {
+            // Find all elements with class 'math' within the given element
+            const mathElements = element.getElementsByClassName('math');
+            for (let elem of mathElements) {
+                const text = elem.textContent;
+                elem.innerHTML = '';
+                katex.render(text, elem, {
+                    displayMode: true,
+                    throwOnError: false
+                });
+            }
+        }
+
+        // Also render math in the theory section on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            const theorySection = document.querySelector('.section');
+            renderMathInElement(theorySection);
+        });
+    </script>
+</body>
+</html>
