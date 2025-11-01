@@ -505,12 +505,6 @@
                                 <td class="note-cell">Converges to 0 at $T$</td>
                             </tr>
                             <tr>
-                                <td class="formula-id">HEDGE-POS-CHG</td>
-                                <td class="desc-cell">Hedged position change</td>
-                                <td class="math-cell">$\\Omega(t,T_d) = \\Delta S(t,T_d) - \\frac{N_F}{N_A}\\Delta F(t,T_d) = \\Delta S(t,T_d) - h \\cdot \\Delta F(t,T_d)$</td>
-                                <td class="note-cell">$h = N_F/N_A$</td>
-                            </tr>
-                            <tr>
                                 <td class="formula-id">HEDGE-RATIO</td>
                                 <td class="desc-cell">Optimal hedge ratio</td>
                                 <td class="math-cell">$h^* = \\rho \\cdot \\frac{\\sigma_S}{\\sigma_F}$</td>
@@ -749,7 +743,7 @@
                             </tr>
                             <tr>
                                 <td class="desc-cell">Butterfly</td>
-                                <td class="note-cell">Long $K_1$, Short 2×$K_2$, Long $K_3$</td>
+                                <td class="note-cell">Long $K_1$, Short 2Ã—$K_2$, Long $K_3$</td>
                                 <td class="math-cell">$K_2 - K_1 - \\text{debit}$</td>
                                 <td class="math-cell">Net debit</td>
                             </tr>
@@ -1079,6 +1073,235 @@
                         </tbody>
                     </table>
 
+                    <div class="section-title">Lognormal Distribution & Probabilistic Quantities</div>
+                    <table class="formula-table compact-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 15%">ID</th>
+                                <th style="width: 22%">Description</th>
+                                <th style="width: 48%">Formula</th>
+                                <th style="width: 15%">Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="formula-id">LN-DEF</td>
+                                <td class="desc-cell">Lognormal definition</td>
+                                <td class="math-cell">If $\\ln(Y) \\sim N(m, v^2)$ then $Y \\sim LN(m, v^2)$</td>
+                                <td class="note-cell">Key property</td>
+                            </tr>
+                            <tr>
+                                <td class="formula-id">LN-PDF</td>
+                                <td class="desc-cell">Lognormal PDF</td>
+                                <td class="math-cell">$f_Y(y) = \\frac{1}{\\sqrt{2\\pi v^2}y}\\exp\\left[-\\frac{(\\ln y - m)^2}{2v^2}\\right]$, $y>0$</td>
+                                <td class="note-cell">Density</td>
+                            </tr>
+                            <tr>
+                                <td class="formula-id">MGF-N</td>
+                                <td class="desc-cell">Normal MGF</td>
+                                <td class="math-cell">If $X \\sim N(m,v^2)$: $M_X(t) = e^{mt + \\frac{1}{2}v^2t^2}$</td>
+                                <td class="note-cell">Moment gen fn</td>
+                            </tr>
+                            <tr>
+                                <td class="formula-id">LN-MOM-K</td>
+                                <td class="desc-cell">Lognormal $k$-moment</td>
+                                <td class="math-cell">$E[Y^k] = \\exp(km + \\frac{1}{2}k^2v^2)$</td>
+                                <td class="note-cell">For any real $k$</td>
+                            </tr>
+                            <tr>
+                                <td class="formula-id">LN-MEAN</td>
+                                <td class="desc-cell">LN mean</td>
+                                <td class="math-cell">$E[Y] = e^{m+v^2/2}$</td>
+                                <td class="note-cell">First moment</td>
+                            </tr>
+                            <tr>
+                                <td class="formula-id">LN-VAR</td>
+                                <td class="desc-cell">LN variance</td>
+                                <td class="math-cell">$\\text{Var}(Y) = e^{2m+v^2}(e^{v^2} - 1)$</td>
+                                <td class="note-cell">Second central</td>
+                            </tr>
+                            <tr>
+                                <td class="formula-id">S-MODEL</td>
+                                <td class="desc-cell">Stock price model</td>
+                                <td class="math-cell">$S(t) = S(0) \\exp[(\\alpha - \\delta - \\frac{\\sigma^2}{2})t + \\sigma\\sqrt{t}Z]$</td>
+                                <td class="note-cell">$Z \\sim N(0,1)$</td>
+                            </tr>
+                            <tr>
+                                <td class="formula-id">LN-S-DIST</td>
+                                <td class="desc-cell">Log stock distribution</td>
+                                <td class="math-cell">$\\ln S(t) \\sim N(\\ln S_0 + (\\alpha-\\delta-\\frac{\\sigma^2}{2})t, \\sigma^2 t)$</td>
+                                <td class="note-cell">Normal dist</td>
+                            </tr>
+                            <tr>
+                                <td class="formula-id">S-EXPECT</td>
+                                <td class="desc-cell">Expected stock price</td>
+                                <td class="math-cell">$E[S(t)] = S(0)e^{(\\alpha-\\delta)t}$</td>
+                                <td class="note-cell">$\\alpha$ = return</td>
+                            </tr>
+                            <tr>
+                                <td class="formula-id">S-VAR-LOG</td>
+                                <td class="desc-cell">Variance of log return</td>
+                                <td class="math-cell">$\\text{Var}[\\ln(S(t)/S(0))] = \\sigma^2 t$</td>
+                                <td class="note-cell">$\\sigma$ = volatility</td>
+                            </tr>
+                            <tr>
+                                <td class="formula-id">DHAT2-PHYS</td>
+                                <td class="desc-cell">$\\hat{d}_2$ (physical)</td>
+                                <td class="math-cell">$\\hat{d}_2 = \\frac{\\ln(S_0/K) + (\\alpha-\\delta-\\sigma^2/2)T}{\\sigma\\sqrt{T}}$</td>
+                                <td class="note-cell">Uses $\\alpha$</td>
+                            </tr>
+                            <tr>
+                                <td class="formula-id">DHAT1-PHYS</td>
+                                <td class="desc-cell">$\\hat{d}_1$ (physical)</td>
+                                <td class="math-cell">$\\hat{d}_1 = \\hat{d}_2 + \\sigma\\sqrt{T} = \\frac{\\ln(S_0/K) + (\\alpha-\\delta+\\sigma^2/2)T}{\\sigma\\sqrt{T}}$</td>
+                                <td class="note-cell">Relation</td>
+                            </tr>
+                            <tr>
+                                <td class="formula-id">EXER-CALL</td>
+                                <td class="desc-cell">Call exercise prob</td>
+                                <td class="math-cell">$P(S_T > K) = N(\\hat{d}_2)$</td>
+                                <td class="note-cell">Physical prob</td>
+                            </tr>
+                            <tr>
+                                <td class="formula-id">EXER-PUT</td>
+                                <td class="desc-cell">Put exercise prob</td>
+                                <td class="math-cell">$P(S_T < K) = N(-\\hat{d}_2)$</td>
+                                <td class="note-cell">Complement</td>
+                            </tr>
+                            <tr>
+                                <td class="formula-id">COND-E-C</td>
+                                <td class="desc-cell">Cond E (call ITM)</td>
+                                <td class="math-cell">$E[S_T|S_T>K] = S_0e^{(\\alpha-\\delta)T}\\frac{N(\\hat{d}_1)}{N(\\hat{d}_2)}$</td>
+                                <td class="note-cell">Given exercise</td>
+                            </tr>
+                            <tr>
+                                <td class="formula-id">COND-E-P</td>
+                                <td class="desc-cell">Cond E (put ITM)</td>
+                                <td class="math-cell">$E[S_T|S_T<K] = S_0e^{(\\alpha-\\delta)T}\\frac{N(-\\hat{d}_1)}{N(-\\hat{d}_2)}$</td>
+                                <td class="note-cell">Given exercise</td>
+                            </tr>
+                            <tr>
+                                <td class="formula-id">PRED-INTV</td>
+                                <td class="desc-cell">Prediction interval</td>
+                                <td class="math-cell">$(S_L, S_U) = (S_0e^{(\\alpha-\\delta-\\frac{\\sigma^2}{2})t+\\sigma\\sqrt{t}N^{-1}(p/2)}, S_0e^{(\\alpha-\\delta-\\frac{\\sigma^2}{2})t+\\sigma\\sqrt{t}N^{-1}(1-p/2)})$</td>
+                                <td class="note-cell">$100(1-p)\\%$</td>
+                            </tr>
+                            <tr>
+                                <td class="formula-id">PRED-UP</td>
+                                <td class="desc-cell">Pred interval upper</td>
+                                <td class="math-cell">$S_U = S_0\\exp[(\\alpha-\\delta-\\frac{\\sigma^2}{2})t + \\sigma\\sqrt{t}N^{-1}(1-p/2)]$</td>
+                                <td class="note-cell">Upper bound</td>
+                            </tr>
+                            <tr>
+                                <td class="formula-id">PRED-LOW</td>
+                                <td class="desc-cell">Pred interval lower</td>
+                                <td class="math-cell">$S_L = S_0\\exp[(\\alpha-\\delta-\\frac{\\sigma^2}{2})t + \\sigma\\sqrt{t}N^{-1}(p/2)]$</td>
+                                <td class="note-cell">Lower bound</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="section-title">Normal Distribution Properties</div>
+                    <table class="formula-table compact-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 15%">ID</th>
+                                <th style="width: 25%">Property</th>
+                                <th style="width: 45%">Formula</th>
+                                <th style="width: 15%">Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="formula-id">N-PDF</td>
+                                <td class="desc-cell">Standard normal PDF</td>
+                                <td class="math-cell">$\\phi(x) = \\frac{1}{\\sqrt{2\\pi}}e^{-x^2/2}$</td>
+                                <td class="note-cell">Bell curve</td>
+                            </tr>
+                            <tr>
+                                <td class="formula-id">N-CDF</td>
+                                <td class="desc-cell">Standard normal CDF</td>
+                                <td class="math-cell">$N(x) = \\int_{-\\infty}^{x} \\phi(u)du = \\frac{1}{2}[1 + \\text{erf}(x/\\sqrt{2})]$</td>
+                                <td class="note-cell">Cumulative</td>
+                            </tr>
+                            <tr>
+                                <td class="formula-id">N-SYM</td>
+                                <td class="desc-cell">Symmetry</td>
+                                <td class="math-cell">$N(-x) = 1 - N(x)$; $\\phi(-x) = \\phi(x)$</td>
+                                <td class="note-cell">Key property</td>
+                            </tr>
+                            <tr>
+                                <td class="formula-id">N-TRANS</td>
+                                <td class="desc-cell">Standardization</td>
+                                <td class="math-cell">If $X \\sim N(m,v^2)$: $Z = \\frac{X-m}{v} \\sim N(0,1)$</td>
+                                <td class="note-cell">Standard form</td>
+                            </tr>
+                            <tr>
+                                <td class="formula-id">N-QUANT</td>
+                                <td class="desc-cell">Key quantiles</td>
+                                <td class="math-cell">$N^{-1}(0.90)=1.282$, $N^{-1}(0.95)=1.645$, $N^{-1}(0.975)=1.96$, $N^{-1}(0.99)=2.326$</td>
+                                <td class="note-cell">Common values</td>
+                            </tr>
+                            <tr>
+                                <td class="formula-id">N-VAL</td>
+                                <td class="desc-cell">Select N values</td>
+                                <td class="math-cell">$N(0)=0.5$, $N(1)=0.841$, $N(1.65)=0.950$, $N(1.96)=0.975$, $N(2.33)=0.990$</td>
+                                <td class="note-cell">For reference</td>
+                            </tr>
+                            <tr>
+                                <td class="formula-id">ERF-DEF</td>
+                                <td class="desc-cell">Error function</td>
+                                <td class="math-cell">$\\text{erf}(x) = \\frac{2}{\\sqrt{\\pi}}\\int_0^x e^{-t^2}dt$</td>
+                                <td class="note-cell">Related to CDF</td>
+                            </tr>
+                            <tr>
+                                <td class="formula-id">CONF-LVL</td>
+                                <td class="desc-cell">Confidence intervals</td>
+                                <td class="math-cell">$P(\\mu - z_{\\alpha/2}\\sigma < X < \\mu + z_{\\alpha/2}\\sigma) = 1-\\alpha$</td>
+                                <td class="note-cell">Two-tailed</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="section-title">Key Concepts & Notes</div>
+                    <table class="formula-table compact-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 30%">Concept</th>
+                                <th style="width: 70%">Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="desc-cell">Physical vs RN</td>
+                                <td class="note-cell">$\\hat{d}_1, \\hat{d}_2$ use $\\alpha$ (physical); $d_1, d_2$ use $r$ (risk-neutral)</td>
+                            </tr>
+                            <tr>
+                                <td class="desc-cell">$\\alpha$ interpretation</td>
+                                <td class="note-cell">Continuously compounded expected total return on stock</td>
+                            </tr>
+                            <tr>
+                                <td class="desc-cell">$\\sigma$ interpretation</td>
+                                <td class="note-cell">Annual volatility of stock price (std dev of log return)</td>
+                            </tr>
+                            <tr>
+                                <td class="desc-cell">Lognormal property</td>
+                                <td class="note-cell">If $\\ln(S_T/S_0)$ is normal, then $S_T$ is lognormal</td>
+                            </tr>
+                            <tr>
+                                <td class="desc-cell">Prediction intervals</td>
+                                <td class="note-cell">Equal-tailed: $P(S_L < S_t < S_U) = 1-p$; replace $Z$ by quantiles</td>
+                            </tr>
+                            <tr>
+                                <td class="desc-cell">Cond expectation formula</td>
+                                <td class="note-cell">$E[X|A] = \\frac{E[X\\mathbf{1}_A]}{P(A)}$ where $\\mathbf{1}_A$ is indicator function</td>
+                            </tr>
+                            <tr>
+                                <td class="desc-cell">Law of total probability</td>
+                                <td class="note-cell">$E[S_T] = E[S_T|S_T>K]P(S_T>K) + E[S_T|S_T<K]P(S_T<K)$</td>
+                            </tr>
+                        </tbody>
+                    </table>
 
 
                 </div>

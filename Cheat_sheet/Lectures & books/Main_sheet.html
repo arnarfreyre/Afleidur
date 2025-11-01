@@ -1,0 +1,1636 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Derivatives Complete Formula Sheet - Ultra Compact</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            },
+            startup: {
+                ready: () => {
+                    MathJax.startup.defaultReady();
+                    MathJax.startup.promise.then(() => {
+                        renderPage();
+                    });
+                }
+            }
+        };
+    </script>
+    <style>
+        :root {
+            --page-margin: 0.5mm;
+            --page-padding: 0.5mm;
+            --font-page-title: 7pt;
+            --font-section-title: 5.5pt;
+            --font-table-header: 4.5pt;
+            --font-formula-id: 3.5pt;
+            --font-description: 4.5pt;
+            --font-math-formula: 4.5pt;
+            --font-notes: 3.5pt;
+            --section-margin-top: 0.5px;
+            --section-margin-bottom: 0px;
+            --table-margin-bottom: 0.5px;
+            --title-margin-bottom: 0.5px;
+            --section-border-width: 0.2px;
+            --table-cell-padding: 0px 0.5px;
+            --table-border-width: 0.15px;
+            --table-header-padding: 0px 0.5px;
+            --line-height: 0.75;
+        }
+
+        @media print {
+            .no-print { display: none !important; }
+            .page { page-break-after: always; margin: 0; padding: var(--page-padding); }
+            body { background: white; margin: 0; padding: 0; }
+            #pageContent { display: none !important; }
+            #printContainer { display: block !important; }
+            @page { margin: var(--page-margin); size: A4; }
+        }
+
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+
+        .page {
+            padding: var(--page-padding);
+            min-height: 29.7cm;
+            max-height: 29.7cm;
+            overflow: hidden;
+        }
+
+        .page h1 {
+            font-size: var(--font-page-title);
+            line-height: var(--line-height);
+            margin: 0 0 var(--title-margin-bottom) 0;
+            padding: 0 0 0.5px 0;
+            border-bottom: var(--section-border-width) solid #000;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: var(--table-margin-bottom);
+            font-size: var(--font-math-formula);
+        }
+
+        th {
+            background-color: #e5e5e5;
+            font-weight: bold;
+            padding: var(--table-header-padding);
+            border: var(--table-border-width) solid #aaa;
+            text-align: left;
+            font-size: var(--font-table-header);
+            line-height: var(--line-height);
+        }
+
+        td {
+            padding: var(--table-cell-padding);
+            border: var(--table-border-width) solid #ccc;
+            vertical-align: middle;
+            line-height: var(--line-height);
+        }
+
+        .formula-id {
+            font-family: 'Courier New', monospace;
+            font-size: var(--font-formula-id);
+            color: #444;
+            font-weight: bold;
+        }
+
+        .section-title {
+            font-weight: bold;
+            font-size: var(--font-section-title);
+            margin-top: var(--section-margin-top);
+            margin-bottom: var(--section-margin-bottom);
+            border-bottom: var(--section-border-width) solid #333;
+            padding-bottom: 0px;
+            line-height: var(--line-height);
+        }
+
+        .math-cell { font-size: var(--font-math-formula); }
+        .note-cell { font-size: var(--font-notes); color: #555; font-style: italic; }
+        .desc-cell { font-weight: 600; font-size: var(--font-description); }
+
+        .two-column {
+            display: flex;
+            gap: 1px;
+            margin-bottom: 0px;
+        }
+
+        .col { flex: 1; min-width: 0; }
+    </style>
+</head>
+<body>
+    <div class="min-h-screen bg-gray-100 p-8">
+        <div class="no-print flex justify-center gap-4 mb-6">
+            <button onclick="downloadPDF()" class="flex items-center gap-2 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors font-semibold">
+                Download PDF
+            </button>
+            <button onclick="flipPage()" class="flex items-center gap-2 bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors font-semibold">
+                Flip Page
+            </button>
+        </div>
+
+        <div class="max-w-[21cm] mx-auto bg-white shadow-2xl">
+            <div id="pageContent"></div>
+        </div>
+
+        <div id="pageIndicator" class="no-print text-center mt-4 text-gray-600 font-semibold">
+            Front Page
+        </div>
+
+        <div id="printContainer" style="display: none;">
+            <div id="printPage1"></div>
+            <div id="printPage2"></div>
+        </div>
+    </div>
+
+    <script>
+        let showFront = true;
+
+        function flipPage() {
+            showFront = !showFront;
+            renderPage();
+        }
+
+        function downloadPDF() {
+            const printContainer = document.getElementById('printContainer');
+            const printPage1 = document.getElementById('printPage1');
+            const printPage2 = document.getElementById('printPage2');
+
+            printPage1.innerHTML = getFrontPageHTML();
+            printPage2.innerHTML = getBackPageHTML();
+            printContainer.style.display = 'block';
+
+            if (window.MathJax && window.MathJax.typesetPromise) {
+                MathJax.typesetPromise([printContainer]).then(() => {
+                    window.print();
+                    setTimeout(() => { printContainer.style.display = 'none'; }, 100);
+                });
+            } else {
+                window.print();
+                setTimeout(() => { printContainer.style.display = 'none'; }, 100);
+            }
+        }
+
+        function renderPage() {
+            const pageContent = document.getElementById('pageContent');
+            const pageIndicator = document.getElementById('pageIndicator');
+
+            if (showFront) {
+                pageContent.innerHTML = getFrontPageHTML();
+                pageIndicator.textContent = 'Front Page';
+            } else {
+                pageContent.innerHTML = getBackPageHTML();
+                pageIndicator.textContent = 'Back Page';
+            }
+
+            if (window.MathJax && window.MathJax.typesetPromise) {
+                MathJax.typesetPromise([pageContent]).catch((e) => console.error(e));
+            }
+        }
+
+        function getFrontPageHTML() {
+            return `
+                <div class="page">
+                    <h1 style="text-align: center; font-weight: bold;">Derivatives Complete Formula Sheet - Page 1</h1>
+
+                    <div class="two-column">
+                        <div class="col">
+                            <div class="section-title">Forward Valuation & Pricing</div>
+                            <table>
+                                <tr>
+                                    <td class="formula-id">FWD-VAL</td>
+                                    <td class="desc-cell">Long payoff</td>
+                                    <td class="math-cell">$V_T^{\\text{long}} = S_T - F(t,T) = S_T - K$</td>
+                                    <td class="note-cell">Profit if $S_T > F$</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">FWD-SHORT</td>
+                                    <td class="desc-cell">Short payoff</td>
+                                    <td class="math-cell">$V_T^{\\text{short}} = K - S_T = F(t,T) - S_T$</td>
+                                    <td class="note-cell">Zero-sum with long</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">FWD-FAIR</td>
+                                    <td class="desc-cell">Fair forward</td>
+                                    <td class="math-cell">$F(t,T) = S(t) \\cdot e^{R(t,T)(T-t)}$</td>
+                                    <td class="note-cell">$= S/D(t,T)$</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">FWD-PREP</td>
+                                    <td class="desc-cell">Prepaid</td>
+                                    <td class="math-cell">$F_P(t,T) = S(t)$</td>
+                                    <td class="note-cell">No income</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">FWD-DIV1</td>
+                                    <td class="desc-cell">One dividend</td>
+                                    <td class="math-cell">$F = [S - PV(C_c)]e^{R(T-t)}$</td>
+                                    <td class="note-cell">$C_c$ at $T_c$</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">FWD-DIVN</td>
+                                    <td class="desc-cell">Multiple divs</td>
+                                    <td class="math-cell">$F = [S - \\sum PV(D_k)]e^{R(T-t)}$</td>
+                                    <td class="note-cell">$F_P = S - \\sum PV(D_k)$</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">FWD-CONT</td>
+                                    <td class="desc-cell">Cont yield</td>
+                                    <td class="math-cell">$F = S \\cdot e^{(R-\\delta)(T-t)}$</td>
+                                    <td class="note-cell">Rate - yield</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">FX-FWD</td>
+                                    <td class="desc-cell">Currency fwd</td>
+                                    <td class="math-cell">$F_{X_{d,f}} = X_{d,f} \\cdot e^{(R_d-R_f)(T-t)}$</td>
+                                    <td class="note-cell">Rate parity</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">FRA-LINK</td>
+                                    <td class="desc-cell">Zero/fwd</td>
+                                    <td class="math-cell">$e^{R(t,T_c)(T_c-t)}e^{F(t;T_c,T)(T-T_c)} = e^{R(t,T)(T-t)}$</td>
+                                    <td class="note-cell">Bootstrap</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">FWD-PREM</td>
+                                    <td class="desc-cell">Premium</td>
+                                    <td class="math-cell">$F/S = e^{(R-\\delta)(T-t)}$</td>
+                                    <td class="note-cell">$>1$ if $R>\\delta$</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">FUT-SPOT</td>
+                                    <td class="desc-cell">Futures parity</td>
+                                    <td class="math-cell">$F_T = S_T$</td>
+                                    <td class="note-cell">At expiry</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">FUT-MTM</td>
+                                    <td class="desc-cell">Mark-to-market</td>
+                                    <td class="math-cell">Cash flow = $F(T_i) - F(T_{i-1})$</td>
+                                    <td class="note-cell">Daily settle</td>
+                                </tr>
+                            </table>
+
+                            <div class="section-title">Special Cases & Relations</div>
+                            <table>
+                                <tr>
+                                    <td class="formula-id">FWD-VALUE</td>
+                                    <td class="desc-cell">Value at t</td>
+                                    <td class="math-cell">$f(t,T) = F(t,T) - K$</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">FWD-PV</td>
+                                    <td class="desc-cell">PV of value</td>
+                                    <td class="math-cell">$f(t,T) = [F(t,T)-K]e^{-r(T-t)}$</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">PREP-REL</td>
+                                    <td class="desc-cell">Prepaid link</td>
+                                    <td class="math-cell">$F_{0,T} = F^P_{0,T} \\cdot e^{rT}$</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">CONTANGO</td>
+                                    <td class="desc-cell">Contango</td>
+                                    <td class="math-cell">$F>S$ when $r>\\delta$</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">BACKWD</td>
+                                    <td class="desc-cell">Backwardation</td>
+                                    <td class="math-cell">$F<S$ when $\\delta>r$</td>
+                                </tr>
+                            </table>
+
+                            <div class="section-title">Hedging Strategies</div>
+                            <table>
+                                <tr>
+                                    <td class="formula-id">HEDGE-L</td>
+                                    <td class="desc-cell">Long hedge</td>
+                                    <td class="math-cell">$\\Delta P = -S_T(1-a) + S_0(1-a)e^{rT}$</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">HEDGE-S</td>
+                                    <td class="desc-cell">Short hedge</td>
+                                    <td class="math-cell">$\\Delta P = S_T(1-a) - S_0(1-a)e^{rT}$</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">BASIS</td>
+                                    <td class="desc-cell">Basis</td>
+                                    <td class="math-cell">$B(t) = S(t) - F(t,T)$</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">HEDGE-POS</td>
+                                    <td class="desc-cell">Hedged pos</td>
+                                    <td class="math-cell">$\\Omega = \\Delta S - h\\Delta F$</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">HEDGE-R</td>
+                                    <td class="desc-cell">Optimal h</td>
+                                    <td class="math-cell">$h^* = \\rho \\frac{\\sigma_S}{\\sigma_F}$</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">CONTRACTS</td>
+                                    <td class="desc-cell">Optimal N</td>
+                                    <td class="math-cell">$N^* = \\beta \\frac{P}{V_S}$</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">INDEX-H</td>
+                                    <td class="desc-cell">Index hedge</td>
+                                    <td class="math-cell">$N^* = \\beta \\frac{P}{250F}$</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">TAILING</td>
+                                    <td class="desc-cell">Tailing</td>
+                                    <td class="math-cell">Buy $e^{-\\delta T}$ shares</td>
+                                </tr>
+                            </table>
+
+                            <div class="section-title">Option Payoffs & Profits</div>
+                            <table>
+                                <thead>
+                                    <tr><th>ID</th><th>Position</th><th>Payoff at T</th><th>Profit</th></tr>
+                                </thead>
+                                <tr>
+                                    <td class="formula-id">CALL-L</td>
+                                    <td class="desc-cell">Long Call</td>
+                                    <td class="math-cell">$\\max(S_T-K,0)$</td>
+                                    <td class="math-cell">$\\max(S_T-K,0)-C_te^{r(T-t)}$</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">CALL-S</td>
+                                    <td class="desc-cell">Short Call</td>
+                                    <td class="math-cell">$-\\max(S_T-K,0)$</td>
+                                    <td class="math-cell">$C_te^{r(T-t)}-\\max(S_T-K,0)$</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">PUT-L</td>
+                                    <td class="desc-cell">Long Put</td>
+                                    <td class="math-cell">$\\max(K-S_T,0)$</td>
+                                    <td class="math-cell">$\\max(K-S_T,0)-P_te^{r(T-t)}$</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">PUT-S</td>
+                                    <td class="desc-cell">Short Put</td>
+                                    <td class="math-cell">$-\\max(K-S_T,0)$</td>
+                                    <td class="math-cell">$P_te^{r(T-t)}-\\max(K-S_T,0)$</td>
+                                </tr>
+                            </table>
+
+                            <div class="section-title">Black-Scholes Formula</div>
+                            <table>
+                                <tr>
+                                    <td class="formula-id">BS-CALL</td>
+                                    <td class="desc-cell">Call</td>
+                                    <td class="math-cell">$C = Se^{-\\delta T}N(d_1) - Ke^{-rT}N(d_2)$</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">BS-PUT</td>
+                                    <td class="desc-cell">Put</td>
+                                    <td class="math-cell">$P = Ke^{-rT}N(-d_2) - Se^{-\\delta T}N(-d_1)$</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">BS-D1</td>
+                                    <td class="desc-cell">d₁</td>
+                                    <td class="math-cell">$d_1 = \\frac{\\ln(S/K)+(r-\\delta+\\sigma^2/2)T}{\\sigma\\sqrt{T}}$</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">BS-D2</td>
+                                    <td class="desc-cell">d₂</td>
+                                    <td class="math-cell">$d_2 = d_1 - \\sigma\\sqrt{T}$</td>
+                                </tr>
+                            </table>
+
+                            <div class="section-title">Greeks - First Order</div>
+                            <table>
+                                <thead><tr><th>ID</th><th>Greek</th><th>Call</th><th>Put</th></tr></thead>
+                                <tr>
+                                    <td class="formula-id">DELTA</td>
+                                    <td class="desc-cell">Δ</td>
+                                    <td class="math-cell">$e^{-\\delta T}N(d_1)$</td>
+                                    <td class="math-cell">$-e^{-\\delta T}N(-d_1)$</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">RHO</td>
+                                    <td class="desc-cell">ρ</td>
+                                    <td class="math-cell">$KTe^{-rT}N(d_2)$</td>
+                                    <td class="math-cell">$-KTe^{-rT}N(-d_2)$</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">PSI</td>
+                                    <td class="desc-cell">Ψ</td>
+                                    <td class="math-cell">$-TSe^{-\\delta T}N(d_1)$</td>
+                                    <td class="math-cell">$TSe^{-\\delta T}N(-d_1)$</td>
+                                </tr>
+                            </table>
+                        </div>
+
+                        <div class="col">
+                            <div class="section-title">Greeks - Second Order & Other</div>
+                            <table>
+                                <tr>
+                                    <td class="formula-id">GAMMA</td>
+                                    <td class="desc-cell">Γ</td>
+                                    <td class="math-cell">$\\frac{e^{-\\delta T}\\phi(d_1)}{S\\sigma\\sqrt{T}}$</td>
+                                    <td class="note-cell">C & P same</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">VEGA</td>
+                                    <td class="desc-cell">ν</td>
+                                    <td class="math-cell">$Se^{-\\delta T}\\phi(d_1)\\sqrt{T}$</td>
+                                    <td class="note-cell">C & P same</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">Θ-C</td>
+                                    <td class="desc-cell">Θ call</td>
+                                    <td class="math-cell">$-\\frac{S\\sigma e^{-\\delta T}\\phi(d_1)}{2\\sqrt{T}} + \\delta Se^{-\\delta T}N(d_1) - rKe^{-rT}N(d_2)$</td>
+                                    <td class="note-cell">Time decay</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">Θ-P</td>
+                                    <td class="desc-cell">Θ put</td>
+                                    <td class="math-cell">$-\\frac{S\\sigma e^{-\\delta T}\\phi(d_1)}{2\\sqrt{T}} - \\delta Se^{-\\delta T}N(-d_1) + rKe^{-rT}N(-d_2)$</td>
+                                    <td class="note-cell">Time decay</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">VOL-OPT</td>
+                                    <td class="desc-cell">σ_opt</td>
+                                    <td class="math-cell">$\\sigma_{option} = |\\Omega| \\sigma_{stock}$</td>
+                                    <td class="note-cell">Vol amplify</td>
+                                </tr>
+                            </table>
+
+                            <div class="section-title">Delta-Gamma Approximations</div>
+                            <table>
+                                <tr>
+                                    <td class="formula-id">Δ-APP</td>
+                                    <td class="desc-cell">Delta</td>
+                                    <td class="math-cell">$\\Delta V \\approx \\Delta \\cdot \\Delta S$</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">Δ-Γ-APP</td>
+                                    <td class="desc-cell">Delta-Gamma</td>
+                                    <td class="math-cell">$\\Delta V \\approx \\Delta \\cdot \\Delta S + \\frac{1}{2}\\Gamma(\\Delta S)^2$</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">Δ-Γ-Θ</td>
+                                    <td class="desc-cell">With Theta</td>
+                                    <td class="math-cell">Add $+ \\Theta \\cdot \\Delta t$</td>
+                                </tr>
+                            </table>
+
+                            <div class="section-title">Binomial Model</div>
+                            <table>
+                                <tr>
+                                    <td class="formula-id">BIN-U</td>
+                                    <td class="desc-cell">Up factor</td>
+                                    <td class="math-cell">$u = e^{(r-\\delta)h+\\sigma\\sqrt{h}}$</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">BIN-D</td>
+                                    <td class="desc-cell">Down</td>
+                                    <td class="math-cell">$d = e^{(r-\\delta)h-\\sigma\\sqrt{h}}$</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">RN-PROB</td>
+                                    <td class="desc-cell">RN prob</td>
+                                    <td class="math-cell">$p^* = \\frac{e^{(r-\\delta)h}-d}{u-d}$</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">BIN-VAL</td>
+                                    <td class="desc-cell">Value</td>
+                                    <td class="math-cell">$V_0 = e^{-rh}[p^*V_u+(1-p^*)V_d]$</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">BIN-Δ</td>
+                                    <td class="desc-cell">Delta</td>
+                                    <td class="math-cell">$\\Delta = \\frac{V_u-V_d}{S_u-S_d}$</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">BIN-AMER</td>
+                                    <td class="desc-cell">Amer option</td>
+                                    <td class="math-cell">$V = \\max(e^{-rh}[p^*V_u+(1-p^*)V_d], \\text{Exercise})$</td>
+                                </tr>
+                            </table>
+
+                            <div class="section-title">Option Bounds</div>
+                            <table>
+                                <thead><tr><th>Type</th><th>American</th><th>European</th></tr></thead>
+                                <tr>
+                                    <td class="desc-cell">Call ≤</td>
+                                    <td class="math-cell">$C \\leq S$</td>
+                                    <td class="math-cell">$c \\leq S$</td>
+                                </tr>
+                                <tr>
+                                    <td class="desc-cell">Call ≥</td>
+                                    <td class="math-cell">$C \\geq S-K$</td>
+                                    <td class="math-cell">$c \\geq S-Ke^{-r(T-t)}$</td>
+                                </tr>
+                                <tr>
+                                    <td class="desc-cell">Put ≤</td>
+                                    <td class="math-cell">$P \\leq K$</td>
+                                    <td class="math-cell">$p \\leq Ke^{-r(T-t)}$</td>
+                                </tr>
+                                <tr>
+                                    <td class="desc-cell">Put ≥</td>
+                                    <td class="math-cell">$P \\geq K-S$</td>
+                                    <td class="math-cell">$p \\geq Ke^{-r(T-t)}-S$</td>
+                                </tr>
+                            </table>
+
+                            <div class="section-title">Put-Call Parity</div>
+                            <table>
+                                <tr>
+                                    <td class="formula-id">PCP-BASE</td>
+                                    <td class="desc-cell">No divs</td>
+                                    <td class="math-cell">$c + Ke^{-r(T-t)} = p + S$</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">PCP-DIV1</td>
+                                    <td class="desc-cell">One div</td>
+                                    <td class="math-cell">$c - p = S - De^{-r(t_d-t)} - Ke^{-r(T-t)}$</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">PCP-DIVN</td>
+                                    <td class="desc-cell">Multiple</td>
+                                    <td class="math-cell">$c - p = S - \\sum_i D_i e^{-r(t_i-t)} - Ke^{-r(T-t)}$</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">PCP-AMER</td>
+                                    <td class="desc-cell">American</td>
+                                    <td class="math-cell">$S-K \\leq C-P \\leq S-Ke^{-r(T-t)}$</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">CREATE-C</td>
+                                    <td class="desc-cell">Create call</td>
+                                    <td class="math-cell">$C = P + S - Ke^{-rT}$</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">CREATE-P</td>
+                                    <td class="desc-cell">Create put</td>
+                                    <td class="math-cell">$P = C - S + Ke^{-rT}$</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">CREATE-S</td>
+                                    <td class="desc-cell">Create stock</td>
+                                    <td class="math-cell">$S = C - P + Ke^{-rT}$</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">ZERO-COST</td>
+                                    <td class="desc-cell">Zero-cost</td>
+                                    <td class="math-cell">$C = P$ when $K = F_{0,T}$</td>
+                                </tr>
+                            </table>
+
+                            <div class="section-title">Futures Mechanics</div>
+                            <table>
+                                <tr>
+                                    <td class="formula-id">MTM</td>
+                                    <td class="desc-cell">MTM</td>
+                                    <td class="math-cell">$D_t = M(F_{t,n}-F_{t-1,n})$</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">MARGIN-B</td>
+                                    <td class="desc-cell">Balance</td>
+                                    <td class="math-cell">$B_t = B_{t-1}e^{r/365} + D_t$</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">INIT-M</td>
+                                    <td class="desc-cell">Initial</td>
+                                    <td class="math-cell">$B_0 = \\%M \\times M \\times F_{0,n}$</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">MAINT-M</td>
+                                    <td class="desc-cell">Maint</td>
+                                    <td class="math-cell">$M_{maint} = k \\times B_0$</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">M-CALL</td>
+                                    <td class="desc-cell">Call</td>
+                                    <td class="math-cell">$B_t < M_{maint}$</td>
+                                </tr>
+                            </table>
+
+                            <div class="section-title">Key Concepts</div>
+                            <table>
+                                <tr>
+                                    <td class="desc-cell">Parallel Payoffs</td>
+                                    <td class="note-cell">If $Payoff_A = Payoff_B + c$ then $Profit_A = Profit_B$</td>
+                                </tr>
+                                <tr>
+                                    <td class="desc-cell">Intrinsic</td>
+                                    <td class="note-cell">Call: $(S-K)^+$, Put: $(K-S)^+$</td>
+                                </tr>
+                                <tr>
+                                    <td class="desc-cell">Time Value</td>
+                                    <td class="note-cell">Premium - Intrinsic ≥ 0</td>
+                                </tr>
+                                <tr>
+                                    <td class="desc-cell">Short Hedge</td>
+                                    <td class="note-cell">Own asset → Short futures</td>
+                                </tr>
+                                <tr>
+                                    <td class="desc-cell">Long Hedge</td>
+                                    <td class="note-cell">Need asset → Long futures</td>
+                                </tr>
+                                <tr>
+                                    <td class="desc-cell">Cash-&-Carry</td>
+                                    <td class="note-cell">$F_{obs} > F_{fair}$: Buy S, short F</td>
+                                </tr>
+                                <tr>
+                                    <td class="desc-cell">Reverse C&C</td>
+                                    <td class="note-cell">$F_{obs} < F_{fair}$: Short S, long F</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function getBackPageHTML() {
+            return `
+                <div class="page">
+                    <h1 style="text-align: center; font-weight: bold;">Derivatives Complete Formula Sheet - Page 2</h1>
+
+                    <div class="two-column">
+                        <div class="col">
+                            <div class="section-title">Common Strategies</div>
+                            <table>
+                                <thead><tr><th>Strategy</th><th>Components</th><th>Max Profit</th></tr></thead>
+                                <tr>
+                                    <td class="desc-cell">Covered Call</td>
+                                    <td class="note-cell">S + Short C</td>
+                                    <td class="note-cell">$K-S_0+C$</td>
+                                </tr>
+                                <tr>
+                                    <td class="desc-cell">Protective Put</td>
+                                    <td class="note-cell">S + Long P</td>
+                                    <td class="note-cell">Unlimited</td>
+                                </tr>
+                                <tr>
+                                    <td class="desc-cell">Bull Call</td>
+                                    <td class="note-cell">Long $K_1$, Short $K_2$</td>
+                                    <td class="note-cell">$K_2-K_1-debit$</td>
+                                </tr>
+                                <tr>
+                                    <td class="desc-cell">Bear Put</td>
+                                    <td class="note-cell">Long $K_2$, Short $K_1$</td>
+                                    <td class="note-cell">$K_2-K_1-debit$</td>
+                                </tr>
+                                <tr>
+                                    <td class="desc-cell">Straddle</td>
+                                    <td class="note-cell">Long C + Long P</td>
+                                    <td class="note-cell">Unlimited</td>
+                                </tr>
+                                <tr>
+                                    <td class="desc-cell">Strangle</td>
+                                    <td class="note-cell">OTM C + OTM P</td>
+                                    <td class="note-cell">Unlimited</td>
+                                </tr>
+                                <tr>
+                                    <td class="desc-cell">Iron Condor</td>
+                                    <td class="note-cell">Bull P + Bear C</td>
+                                    <td class="note-cell">Net credit</td>
+                                </tr>
+                                <tr>
+                                    <td class="desc-cell">Butterfly</td>
+                                    <td class="note-cell">$K_1$, -2×$K_2$, $K_3$</td>
+                                    <td class="note-cell">$K_2-K_1-debit$</td>
+                                </tr>
+                            </table>
+
+                            <div class="section-title">Strategy Payoffs</div>
+                            <table>
+                                <tr>
+                                    <td class="formula-id">BULL-S</td>
+                                    <td class="desc-cell">Bull call</td>
+                                    <td class="math-cell">$\\max(0,\\min(S_T-K_1,K_2-K_1))$</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">BEAR-S</td>
+                                    <td class="desc-cell">Bear put</td>
+                                    <td class="math-cell">$\\max(0,\\min(K_2-S_T,K_2-K_1))$</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">STRAD</td>
+                                    <td class="desc-cell">Straddle</td>
+                                    <td class="math-cell">$|S_T-K| = (S_T-K)^++(K-S_T)^+$</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">STRANG</td>
+                                    <td class="desc-cell">Strangle</td>
+                                    <td class="math-cell">$(S_T-K_2)^++(K_1-S_T)^+$</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">BUTTER</td>
+                                    <td class="desc-cell">Butterfly</td>
+                                    <td class="math-cell">$\\max(0,\\min(S_T-K_1,K_3-S_T))$</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">COLLAR</td>
+                                    <td class="desc-cell">Collar</td>
+                                    <td class="math-cell">$\\max(\\min(S_T,K_2),K_1)$</td>
+                                </tr>
+                            </table>
+
+                            <div class="section-title">Covered & Insurance</div>
+                            <table>
+                                <tr>
+                                    <td class="formula-id">COV-C</td>
+                                    <td class="desc-cell">Covered call</td>
+                                    <td class="math-cell">$\\min(S_T,K)$</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">FLOOR</td>
+                                    <td class="desc-cell">Floor</td>
+                                    <td class="math-cell">$\\max(S_T,K)$</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">CAP</td>
+                                    <td class="desc-cell">Cap</td>
+                                    <td class="math-cell">$-\\min(S_T,K)$</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">COV-P</td>
+                                    <td class="desc-cell">Covered put</td>
+                                    <td class="math-cell">$-\\max(S_T,K)$</td>
+                                </tr>
+                            </table>
+
+                            <div class="section-title">Statistics Fundamentals</div>
+                            <table>
+                                <tr>
+                                    <td class="desc-cell">Var(X)</td>
+                                    <td class="math-cell">$E[X^2]-(E[X])^2 = E[(X-\\mu)^2]$</td>
+                                </tr>
+                                <tr>
+                                    <td class="desc-cell">σ</td>
+                                    <td class="math-cell">$\\sqrt{\\text{Var}(X)}$</td>
+                                </tr>
+                                <tr>
+                                    <td class="desc-cell">Cov(X,Y)</td>
+                                    <td class="math-cell">$E[XY]-E[X]E[Y]$</td>
+                                </tr>
+                                <tr>
+                                    <td class="desc-cell">ρ</td>
+                                    <td class="math-cell">$\\frac{\\text{Cov}(X,Y)}{\\sigma_X\\sigma_Y}$, $-1 \\leq \\rho \\leq 1$</td>
+                                </tr>
+                                <tr>
+                                    <td class="desc-cell">Var(X+Y)</td>
+                                    <td class="math-cell">$\\text{Var}(X)+\\text{Var}(Y)+2\\text{Cov}(X,Y)$</td>
+                                </tr>
+                                <tr>
+                                    <td class="desc-cell">Var(aX+b)</td>
+                                    <td class="math-cell">$a^2\\text{Var}(X)$</td>
+                                </tr>
+                            </table>
+
+                            <div class="section-title">Itô's Lemma & Stochastic Calculus</div>
+                            <table>
+                                <tr>
+                                    <td class="formula-id">ITO-PROC</td>
+                                    <td class="desc-cell">Itô process</td>
+                                    <td class="math-cell">$dX = \\mu(t,X)dt + \\sigma(t,X)dW$</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">ITO-LEM</td>
+                                    <td class="desc-cell">Itô's Lemma</td>
+                                    <td class="math-cell">$df = \\left(\\frac{\\partial f}{\\partial t} + \\mu\\frac{\\partial f}{\\partial X} + \\frac{\\sigma^2}{2}\\frac{\\partial^2 f}{\\partial X^2}\\right)dt + \\sigma\\frac{\\partial f}{\\partial X}dW$</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">GBM-SDE</td>
+                                    <td class="desc-cell">GBM SDE</td>
+                                    <td class="math-cell">$dS = \\mu S dt + \\sigma S dW$</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">GBM-SOL</td>
+                                    <td class="desc-cell">GBM solution</td>
+                                    <td class="math-cell">$S_t = S_0 \\exp\\left[\\left(\\mu - \\frac{\\sigma^2}{2}\\right)t + \\sigma W(t)\\right]$</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">LOG-S</td>
+                                    <td class="desc-cell">Log stock dist</td>
+                                    <td class="math-cell">$\\ln(S_T/S_0) \\sim N\\left[\\left(\\mu - \\frac{\\sigma^2}{2}\\right)T, \\sigma^2 T\\right]$</td>
+                                </tr>
+                            </table>
+
+                            <div class="section-title">GBM - Expected Values & Variance</div>
+                            <table>
+                                <tr>
+                                    <td class="formula-id">GBM-MEAN</td>
+                                    <td class="desc-cell">Expected S_t</td>
+                                    <td class="math-cell">$E[S_t] = S_0 e^{\\mu t}$</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">GBM-VAR</td>
+                                    <td class="desc-cell">Variance of S</td>
+                                    <td class="math-cell">$\\text{Var}(S_t) = S_0^2 e^{2\\mu t}(e^{\\sigma^2 t} - 1)$</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">LNORM-MEAN</td>
+                                    <td class="desc-cell">Lognormal mean</td>
+                                    <td class="math-cell">If $\\ln Y \\sim N(m, v^2)$, then $E[Y] = e^{m + v^2/2}$</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">LNORM-VAR</td>
+                                    <td class="desc-cell">Lognormal var</td>
+                                    <td class="math-cell">$\\text{Var}(Y) = e^{2m+v^2}(e^{v^2} - 1)$</td>
+                                </tr>
+                            </table>
+
+                            <div class="section-title">Lognormal Distribution & Probabilistic Quantities</div>
+                            <table>
+                                <tr>
+                                    <td class="formula-id">LN-DEF</td>
+                                    <td class="desc-cell">LN definition</td>
+                                    <td class="math-cell">If $\\ln(Y) \\sim N(m, v^2)$ then $Y \\sim LN(m, v^2)$</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">LN-PDF</td>
+                                    <td class="desc-cell">LN PDF</td>
+                                    <td class="math-cell">$f_Y(y) = \\frac{1}{\\sqrt{2\\pi v^2}y}\\exp\\left[-\\frac{(\\ln y - m)^2}{2v^2}\\right]$, $y>0$</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">MGF-N</td>
+                                    <td class="desc-cell">Normal MGF</td>
+                                    <td class="math-cell">If $X \\sim N(m,v^2)$: $M_X(t) = e^{mt + \\frac{1}{2}v^2t^2}$</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">LN-MOM-K</td>
+                                    <td class="desc-cell">LN k-th moment</td>
+                                    <td class="math-cell">$E[Y^k] = \\exp(km + \\frac{1}{2}k^2v^2)$ for any real $k$</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">S-MODEL</td>
+                                    <td class="desc-cell">Stock price model</td>
+                                    <td class="math-cell">$S(t) = S(0) \\exp[(\\alpha - \\delta - \\frac{\\sigma^2}{2})t + \\sigma\\sqrt{t}Z]$, $Z \\sim N(0,1)$</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">S-EXPECT</td>
+                                    <td class="desc-cell">Expected S(t)</td>
+                                    <td class="math-cell">$E[S(t)] = S(0)e^{(\\alpha-\\delta)t}$, $\\alpha$ = expected return</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">S-VAR-LOG</td>
+                                    <td class="desc-cell">Var of log return</td>
+                                    <td class="math-cell">$\\text{Var}[\\ln(S(t)/S(0))] = \\sigma^2 t$</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">DHAT2-PHYS</td>
+                                    <td class="desc-cell">$\\hat{d}_2$ (physical)</td>
+                                    <td class="math-cell">$\\hat{d}_2 = \\frac{\\ln(S_0/K) + (\\alpha-\\delta-\\sigma^2/2)T}{\\sigma\\sqrt{T}}$ (uses $\\alpha$)</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">DHAT1-PHYS</td>
+                                    <td class="desc-cell">$\\hat{d}_1$ (physical)</td>
+                                    <td class="math-cell">$\\hat{d}_1 = \\hat{d}_2 + \\sigma\\sqrt{T}$</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">EXER-CALL</td>
+                                    <td class="desc-cell">Call exercise prob</td>
+                                    <td class="math-cell">$P(S_T > K) = N(\\hat{d}_2)$ (physical measure)</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">EXER-PUT</td>
+                                    <td class="desc-cell">Put exercise prob</td>
+                                    <td class="math-cell">$P(S_T < K) = N(-\\hat{d}_2)$</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">COND-E-C</td>
+                                    <td class="desc-cell">Cond E (call ITM)</td>
+                                    <td class="math-cell">$E[S_T|S_T>K] = S_0e^{(\\alpha-\\delta)T}\\frac{N(\\hat{d}_1)}{N(\\hat{d}_2)}$</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">COND-E-P</td>
+                                    <td class="desc-cell">Cond E (put ITM)</td>
+                                    <td class="math-cell">$E[S_T|S_T<K] = S_0e^{(\\alpha-\\delta)T}\\frac{N(-\\hat{d}_1)}{N(-\\hat{d}_2)}$</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">PRED-UP</td>
+                                    <td class="desc-cell">Pred interval upper</td>
+                                    <td class="math-cell">$S_U = S_0\\exp[(\\alpha-\\delta-\\frac{\\sigma^2}{2})t + \\sigma\\sqrt{t}N^{-1}(1-p/2)]$</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">PRED-LOW</td>
+                                    <td class="desc-cell">Pred interval lower</td>
+                                    <td class="math-cell">$S_L = S_0\\exp[(\\alpha-\\delta-\\frac{\\sigma^2}{2})t + \\sigma\\sqrt{t}N^{-1}(p/2)]$</td>
+                                </tr>
+                            </table>
+
+                            <div class="section-title">Normal Distribution Properties</div>
+                            <table>
+                                <tr>
+                                    <td class="formula-id">N-PDF</td>
+                                    <td class="desc-cell">Std normal PDF</td>
+                                    <td class="math-cell">$\\phi(x) = \\frac{1}{\\sqrt{2\\pi}}e^{-x^2/2}$</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">N-CDF</td>
+                                    <td class="desc-cell">Std normal CDF</td>
+                                    <td class="math-cell">$N(x) = \\int_{-\\infty}^{x} \\phi(u)du = \\frac{1}{2}[1 + \\text{erf}(x/\\sqrt{2})]$</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">N-SYM</td>
+                                    <td class="desc-cell">Symmetry</td>
+                                    <td class="math-cell">$N(-x) = 1 - N(x)$; $\\phi(-x) = \\phi(x)$</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">N-TRANS</td>
+                                    <td class="desc-cell">Standardization</td>
+                                    <td class="math-cell">If $X \\sim N(m,v^2)$: $Z = \\frac{X-m}{v} \\sim N(0,1)$</td>
+                                </tr>
+
+                                <tr>
+                                    <td class="formula-id">ERF-DEF</td>
+                                    <td class="desc-cell">Error function</td>
+                                    <td class="math-cell">$\\text{erf}(x) = \\frac{2}{\\sqrt{\\pi}}\\int_0^x e^{-t^2}dt$</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">CONF-LVL</td>
+                                    <td class="desc-cell">Confidence interval</td>
+                                    <td class="math-cell">$P(\\mu - z_{\\alpha/2}\\sigma < X < \\mu + z_{\\alpha/2}\\sigma) = 1-\\alpha$</td>
+                                </tr>
+                            </table>
+
+                            <div class="section-title">American Options - Early Exercise</div>
+                            <table>
+                                <tr>
+                                    <td class="formula-id">AMER-C-ND</td>
+                                    <td class="desc-cell">Amer call (no div)</td>
+                                    <td class="math-cell">Never early exercise; $C_{Amer} = C_{Euro}$</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">AMER-P-EX</td>
+                                    <td class="desc-cell">Amer put criterion</td>
+                                    <td class="math-cell">Exercise when $(K - S) >$ Hold value</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">AMER-VAL</td>
+                                    <td class="desc-cell">Amer value</td>
+                                    <td class="math-cell">$V_{Amer} = \\max(\\text{Hold}, \\text{Exercise})$</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">AMER-INEQ</td>
+                                    <td class="desc-cell">Amer bound</td>
+                                    <td class="math-cell">$V_{Amer} \\geq V_{Euro}$</td>
+                                </tr>
+                            </table>
+
+                            <div class="section-title">Option Bounds - Upper & Lower</div>
+                            <table>
+                                <tr>
+                                    <td class="formula-id">C-LOWER</td>
+                                    <td class="desc-cell">Call lower</td>
+                                    <td class="math-cell">$C \\geq \\max(0, S_0 e^{-\\delta T} - Ke^{-rT})$</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">C-UPPER</td>
+                                    <td class="desc-cell">Call upper</td>
+                                    <td class="math-cell">$C \\leq S_0 e^{-\\delta T}$</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">P-LOWER</td>
+                                    <td class="desc-cell">Put lower</td>
+                                    <td class="math-cell">$P \\geq \\max(0, Ke^{-rT} - S_0 e^{-\\delta T})$</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">P-UPPER</td>
+                                    <td class="desc-cell">Put upper</td>
+                                    <td class="math-cell">$P \\leq Ke^{-rT}$ (Euro); $P \\leq K$ (Amer)</td>
+                                </tr>
+                            </table>
+
+                            <div class="section-title">Advanced Spreads & Strategies</div>
+                            <table>
+                                <tr>
+                                    <td class="formula-id">BULL-C</td>
+                                    <td class="desc-cell">Bull spread (calls)</td>
+                                    <td class="math-cell">Long $K_1$-call + Short $K_2$-call ($K_1 < K_2$); Max: $K_2 - K_1$</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">BULL-P</td>
+                                    <td class="desc-cell">Bull spread (puts)</td>
+                                    <td class="math-cell">Long $K_1$-put + Short $K_2$-put ($K_1 < K_2$); Same payoff</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">BEAR-SPR</td>
+                                    <td class="desc-cell">Bear spread</td>
+                                    <td class="math-cell">Short $K_1$ + Long $K_2$ (same type); Max: $K_2 - K_1$</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">BOX</td>
+                                    <td class="desc-cell">Box spread</td>
+                                    <td class="math-cell">Long $K_1$ synth fwd + Short $K_2$ synth fwd; Payoff: $K_2 - K_1$</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">ZERO-COL</td>
+                                    <td class="desc-cell">Zero-cost collar</td>
+                                    <td class="math-cell">$P(K_1) = C(K_2)$ where $K_1 < F_{0,T} < K_2$</td>
+                                </tr>
+                            </table>
+
+                            <div class="section-title">Elasticity & Additional Relationships</div>
+                            <table>
+                                <tr>
+                                    <td class="formula-id">ELAS-C</td>
+                                    <td class="desc-cell">Call Elasticity</td>
+                                    <td class="math-cell">$\\Omega_C = \\frac{S_0 e^{-\\delta T}N(d_1)}{C}$</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">ELAS-P</td>
+                                    <td class="desc-cell">Put Elasticity</td>
+                                    <td class="math-cell">$\\Omega_P = -\\frac{S_0 e^{-\\delta T}N(-d_1)}{P}$</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">PCP-GK</td>
+                                    <td class="desc-cell">PCP Greeks</td>
+                                    <td class="math-cell">$\\Delta_C-\\Delta_P = e^{-\\delta T}$, $\\Gamma_C = \\Gamma_P$</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">PORT-GK</td>
+                                    <td class="desc-cell">Portfolio Gk</td>
+                                    <td class="math-cell">$Greek_{port} = \\sum Greek_i$</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">Γ-Δ-REL</td>
+                                    <td class="desc-cell">Γ-Δ relation</td>
+                                    <td class="math-cell">$\\Gamma = \\frac{\\partial\\Delta}{\\partial S}$</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">VOL-SCALE</td>
+                                    <td class="desc-cell">Vol scaling</td>
+                                    <td class="math-cell">$\\sigma_{period} = \\sigma_{annual}\\sqrt{T}$</td>
+                                </tr>
+                            </table>
+                        </div>
+
+                        <div class="col">
+                            <div class="section-title">Quick Reference</div>
+                            <table>
+                                <thead><tr><th>Symbol</th><th>Meaning</th><th>Symbol</th><th>Meaning</th></tr></thead>
+                                <tr>
+                                    <td>$\\phi(x)$</td><td>Std N PDF</td>
+                                    <td>$N(x)$</td><td>Std N CDF</td>
+                                </tr>
+                                <tr>
+                                    <td>$S_0,S_T$</td><td>Stock price</td>
+                                    <td>$K$</td><td>Strike</td>
+                                </tr>
+                                <tr>
+                                    <td>$r$</td><td>Risk-free</td>
+                                    <td>$\\delta$</td><td>Div yield</td>
+                                </tr>
+                                <tr>
+                                    <td>$\\sigma$</td><td>Volatility</td>
+                                    <td>$T$</td><td>Maturity</td>
+                                </tr>
+                                <tr>
+                                    <td>$p^*$</td><td>RN prob</td>
+                                    <td>$F_{0,T}$</td><td>Forward</td>
+                                </tr>
+
+
+                            </table>
+
+                            <div class="section-title">Synthetic Positions</div>
+                            <table>
+                                <tr>
+                                    <td class="formula-id">SYN-FWD-L</td>
+                                    <td class="desc-cell">Synth long fwd</td>
+                                    <td class="math-cell">Long C + Short P (same K, T)</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">SYN-FWD-S</td>
+                                    <td class="desc-cell">Synth short fwd</td>
+                                    <td class="math-cell">Short C + Long P (same K, T)</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">SYN-CALL</td>
+                                    <td class="desc-cell">Synth call</td>
+                                    <td class="math-cell">Long S + Long P - Borrow $PV(K)$</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">SYN-PUT</td>
+                                    <td class="desc-cell">Synth put</td>
+                                    <td class="math-cell">Short S + Long C + Lend $PV(K)$</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">SYN-STK</td>
+                                    <td class="desc-cell">Synth stock</td>
+                                    <td class="math-cell">Long C + Short P + Borrow $PV(K)$</td>
+                                </tr>
+                            </table>
+
+                            <div class="section-title">Hedging Strategies</div>
+                            <table>
+                                <tr>
+                                    <td class="formula-id">Δ-HEDGE</td>
+                                    <td class="desc-cell">Delta-neutral</td>
+                                    <td class="math-cell">Hold $-\\Delta$ shares per option</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">Γ-HEDGE</td>
+                                    <td class="desc-cell">Gamma-neutral</td>
+                                    <td class="math-cell">$\\Gamma_{portfolio} = 0$, use options</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">ν-HEDGE</td>
+                                    <td class="desc-cell">Vega-neutral</td>
+                                    <td class="math-cell">$\\nu_{portfolio} = 0$, vol hedge</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">H-PROFIT</td>
+                                    <td class="desc-cell">Hedge profit</td>
+                                    <td class="math-cell">$\\Pi = \\frac{1}{2}\\Gamma S^2(\\sigma^2_{real}-\\sigma^2_{impl})\\Delta t$</td>
+                                </tr>
+                            </table>
+
+                            <div class="section-title">Special Cases - BS Applications</div>
+                            <table>
+                                <tr>
+                                    <td class="formula-id">DISC-DIV</td>
+                                    <td class="desc-cell">Discrete dividends</td>
+                                    <td class="math-cell">Use $S_0 - PV(Div)$ for $S_0$</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">FX-OPT</td>
+                                    <td class="desc-cell">Currency options</td>
+                                    <td class="math-cell">$S_0 \\to X_0$, $\\delta \\to r_f$, $r \\to r_d$</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">FUT-OPT</td>
+                                    <td class="desc-cell">Futures options</td>
+                                    <td class="math-cell">$C = e^{-rT}[F_0N(d_1)-KN(d_2)]$</td>
+                                </tr>
+                            </table>
+
+                            <div class="section-title">Lognormal Distribution</div>
+                            <table>
+                                <tr>
+                                    <td class="formula-id">LN-MEAN</td>
+                                    <td class="desc-cell">Expected $S_T$</td>
+                                    <td class="math-cell">$E[S_T] = S_0e^{(\\alpha-\\delta)T}$</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">LN-VAR</td>
+                                    <td class="desc-cell">Var of ln(S)</td>
+                                    <td class="math-cell">$Var[\\ln(S_T)] = \\sigma^2 T$</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">RN-DRIFT</td>
+                                    <td class="desc-cell">RN drift</td>
+                                    <td class="math-cell">$\\ln(S_T) \\sim N(\\ln(S_0)+(r-\\delta-\\frac{\\sigma^2}{2})T, \\sigma^2T)$</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">PROB-ITM</td>
+                                    <td class="desc-cell">Prob ITM (RN)</td>
+                                    <td class="math-cell">Call: $N(d_2)$, Put: $N(-d_2)$</td>
+                                </tr>
+                            </table>
+
+                            <div class="section-title">Volatility & Implied Vol</div>
+                            <table>
+                                <tr>
+                                    <td class="formula-id">HIST-VOL</td>
+                                    <td class="desc-cell">Historical vol</td>
+                                    <td class="math-cell">$\\sigma = \\sqrt{\\frac{252}{n}\\sum (r_i - \\bar{r})^2}$</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">IMP-VOL</td>
+                                    <td class="desc-cell">Implied vol</td>
+                                    <td class="math-cell">Solve $C_{mkt} = BS(S,K,r,T,\\sigma_{IV})$</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">ATM-APPR</td>
+                                    <td class="desc-cell">ATM approx</td>
+                                    <td class="math-cell">$C \\approx 0.4S_0\\sigma\\sqrt{T}$</td>
+                                </tr>
+                            </table>
+
+                            <div class="section-title">Exotic Options - Barriers</div>
+                            <table>
+                                <tr>
+                                    <td class="formula-id">DN-IN-C</td>
+                                    <td class="desc-cell">Down-in call</td>
+                                    <td class="math-cell">$(S_T-K)^+ \\cdot \\mathbf{1}_{m_T \\leq H}$, $H < S_0$</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">UP-OUT-C</td>
+                                    <td class="desc-cell">Up-out call</td>
+                                    <td class="math-cell">$(S_T-K)^+ \\cdot \\mathbf{1}_{M_T < H}$, $H > S_0$</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">BAR-PAR</td>
+                                    <td class="desc-cell">Barrier parity</td>
+                                    <td class="math-cell">Knock-in + Knock-out = Vanilla</td>
+                                </tr>
+                            </table>
+
+                            <div class="section-title">Exotic Options - Path-Dependent</div>
+                            <table>
+                                <tr>
+                                    <td class="formula-id">ASIAN-AR</td>
+                                    <td class="desc-cell">Arithmetic Asian</td>
+                                    <td class="math-cell">$(\\frac{1}{n}\\sum S_{t_i} - K)^+$</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">ASIAN-GE</td>
+                                    <td class="desc-cell">Geometric Asian</td>
+                                    <td class="math-cell">$((\\prod S_{t_i})^{1/n} - K)^+$</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">LOOK-C</td>
+                                    <td class="desc-cell">Lookback call</td>
+                                    <td class="math-cell">$S_T - \\min_{0 \\leq t \\leq T} S_t$</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">LOOK-P</td>
+                                    <td class="desc-cell">Lookback put</td>
+                                    <td class="math-cell">$\\max_{0 \\leq t \\leq T} S_t - S_T$</td>
+                                </tr>
+                            </table>
+
+                            <div class="section-title">Exotic Options - Other</div>
+                            <table>
+                                <tr>
+                                    <td class="formula-id">GAP-C</td>
+                                    <td class="desc-cell">Gap call</td>
+                                    <td class="math-cell">$(S_T - K_1) \\cdot \\mathbf{1}_{S_T > K_2}$</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">CASH-DN</td>
+                                    <td class="desc-cell">Cash-or-nothing</td>
+                                    <td class="math-cell">$B \\cdot \\mathbf{1}_{S_T > K}$, Price: $Be^{-rT}N(d_2)$</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">ASSET-DN</td>
+                                    <td class="desc-cell">Asset-or-nothing</td>
+                                    <td class="math-cell">$S_T \\cdot \\mathbf{1}_{S_T > K}$, Price: $S_0e^{-\\delta T}N(d_1)$</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">CHOOSER</td>
+                                    <td class="desc-cell">Chooser option</td>
+                                    <td class="math-cell">At $t_c$: $\\max(C_{t_c}, P_{t_c})$</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">EXCHANGE</td>
+                                    <td class="desc-cell">Exchange option</td>
+                                    <td class="math-cell">$(S_{1,T} - S_{2,T})^+$ (Margrabe)</td>
+                                </tr>
+                            </table>
+
+                            <div class="section-title">Important Notes</div>
+                            <table>
+                                <tr>
+                                    <td class="note-cell" colspan="2"><strong>BS PDE:</strong> $\\frac{\\partial V}{\\partial t} + rS\\frac{\\partial V}{\\partial S} + \\frac{1}{2}\\sigma^2S^2\\frac{\\partial^2V}{\\partial S^2} = rV$</td>
+                                </tr>
+                                <tr>
+                                    <td class="note-cell" colspan="2"><strong>Time conventions:</strong> 30/360 (Bond), ACT/365 (Money), ACT/ACT (Treasury)</td>
+                                </tr>
+                                <tr>
+                                    <td class="note-cell" colspan="2"><strong>Settlement:</strong> T+2 standard, 252 trading days/year</td>
+                                </tr>
+                                <tr>
+                                    <td class="note-cell" colspan="2"><strong>Moneyness:</strong> Call ITM: $S_0 > K$; ATM: $S_0 \\approx K$; OTM: $S_0 < K$ (opposite for puts)</td>
+                                </tr>
+                                <tr>
+                                    <td class="note-cell" colspan="2"><strong>Wiener process:</strong> $W(t)$ is standard Brownian motion; $dW \\sim N(0, dt)$; $E[dW] = 0$</td>
+                                </tr>
+                                <tr>
+                                    <td class="note-cell" colspan="2"><strong>Normal PDF:</strong> $\\phi(x) = \\frac{1}{\\sqrt{2\\pi}}e^{-x^2/2}$; $N(x)$ is standard normal CDF</td>
+                                </tr>
+                                <tr>
+                                    <td class="note-cell" colspan="2"><strong>Physical vs RN:</strong> $\\hat{d}_1, \\hat{d}_2$ use $\\alpha$ (physical prob); $d_1, d_2$ use $r$ (risk-neutral pricing)</td>
+                                </tr>
+                            </table>
+
+                            <div class="section-title">Key Principles & Concepts</div>
+                            <table>
+
+                                <tr>
+                                    <td class="note-cell" colspan="2"><strong>Intrinsic Value:</strong> Value if exercised NOW; Call: $(S-K)^+$, Put: $(K-S)^+$</td>
+                                </tr>
+                                <tr>
+                                    <td class="note-cell" colspan="2"><strong>Time Value:</strong> Premium - Intrinsic Value; Always $\\geq 0$ for options</td>
+                                </tr>
+                                <tr>
+                                    <td class="note-cell" colspan="2"><strong>Cash-and-Carry:</strong> When $F_{obs} > F_{fair}$: Buy asset, borrow, short forward (arbitrage)</td>
+                                </tr>
+                                <tr>
+                                    <td class="note-cell" colspan="2"><strong>Reverse C&C:</strong> When $F_{obs} < F_{fair}$: Short asset, lend, long forward (arbitrage)</td>
+                                </tr>
+                            </table>
+
+                            <div class="section-title">Black-Scholes Framework - Complete</div>
+                            <table>
+                                <thead><tr><th>ID</th><th>Description</th><th>Formula</th><th>Notes</th></tr></thead>
+                                <tr>
+                                    <td class="formula-id">BS-ASSM1</td>
+                                    <td class="desc-cell">Stock prices</td>
+                                    <td class="math-cell">$S(t)$ lognormally distributed</td>
+                                    <td class="note-cell">Continuous paths</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">BS-ASSM2</td>
+                                    <td class="desc-cell">Volatility</td>
+                                    <td class="math-cell">$\\sigma$ constant over time</td>
+                                    <td class="note-cell">Known parameter</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">BS-ASSM3</td>
+                                    <td class="desc-cell">Risk-free rate</td>
+                                    <td class="math-cell">$r$ known and constant</td>
+                                    <td class="note-cell">Cont compounded</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">BS-ASSM4</td>
+                                    <td class="desc-cell">Frictionless</td>
+                                    <td class="math-cell">No taxes, costs, spreads</td>
+                                    <td class="note-cell">No restrictions</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">BS-ASSM5</td>
+                                    <td class="desc-cell">Dividends</td>
+                                    <td class="math-cell">Continuous yield $\\delta$</td>
+                                    <td class="note-cell">Or discrete</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">BS-PDE</td>
+                                    <td class="desc-cell">BS equation</td>
+                                    <td class="math-cell">$\\frac{\\partial V}{\\partial t} + rS\\frac{\\partial V}{\\partial S} + \\frac{1}{2}\\sigma^2S^2\\frac{\\partial^2V}{\\partial S^2} = rV$</td>
+                                    <td class="note-cell">Fundamental PDE</td>
+                                </tr>
+                            </table>
+
+                            <div class="section-title">BS Pricing Formulas - Continuous Dividends</div>
+                            <table>
+                                <tr>
+                                    <td class="formula-id">BS-CALL-FULL</td>
+                                    <td class="desc-cell">Call price</td>
+                                    <td class="math-cell">$C = S_0e^{-\\delta T}N(d_1) - Ke^{-rT}N(d_2)$</td>
+                                    <td class="note-cell">Standard BS</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">BS-PUT-FULL</td>
+                                    <td class="desc-cell">Put price</td>
+                                    <td class="math-cell">$P = Ke^{-rT}N(-d_2) - S_0e^{-\\delta T}N(-d_1)$</td>
+                                    <td class="note-cell">Standard BS</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">BS-D1-FULL</td>
+                                    <td class="desc-cell">d₁ formula</td>
+                                    <td class="math-cell">$d_1 = \\frac{\\ln(S_0/K)+(r-\\delta+\\sigma^2/2)T}{\\sigma\\sqrt{T}}$</td>
+                                    <td class="note-cell">For calls/puts</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">BS-D2-FULL</td>
+                                    <td class="desc-cell">d₂ formula</td>
+                                    <td class="math-cell">$d_2 = d_1 - \\sigma\\sqrt{T} = \\frac{\\ln(S_0/K)+(r-\\delta-\\sigma^2/2)T}{\\sigma\\sqrt{T}}$</td>
+                                    <td class="note-cell">Link to d₁</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">RN-PRICE</td>
+                                    <td class="desc-cell">RN valuation</td>
+                                    <td class="math-cell">$V_0 = e^{-rT}E^*[\\text{Payoff}]$</td>
+                                    <td class="note-cell">Key principle</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">RN-DRIFT</td>
+                                    <td class="desc-cell">RN stock dist</td>
+                                    <td class="math-cell">$S(T) \\overset{d}{=} S_0\\exp[(r-\\delta-\\frac{\\sigma^2}{2})T + \\sigma\\sqrt{T}Z]$</td>
+                                    <td class="note-cell">$Z \\sim N(0,1)$</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">N-D2-MEAN</td>
+                                    <td class="desc-cell">$N(d_2)$ meaning</td>
+                                    <td class="math-cell">$P^*(S_T > K)$ for call</td>
+                                    <td class="note-cell">RN exercise prob</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">N-D1-MEAN</td>
+                                    <td class="desc-cell">$N(d_1)$ meaning</td>
+                                    <td class="math-cell">Related to $E^*[S_T|S_T>K]$</td>
+                                    <td class="note-cell">Conditional exp</td>
+                                </tr>
+                            </table>
+
+                            <div class="section-title">BS Interpretations</div>
+                            <table>
+                                <tr>
+                                    <td class="formula-id">COST-BEN-C</td>
+                                    <td class="desc-cell">Call benefit</td>
+                                    <td class="math-cell">$S_0e^{-\\delta T}N(d_1) = F_0^P(S)N(d_1)$</td>
+                                    <td class="note-cell">Expected PV receive</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">COST-C</td>
+                                    <td class="desc-cell">Call cost</td>
+                                    <td class="math-cell">$Ke^{-rT}N(d_2)$</td>
+                                    <td class="note-cell">Expected PV pay</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">COST-BEN-P</td>
+                                    <td class="desc-cell">Put benefit</td>
+                                    <td class="math-cell">$Ke^{-rT}N(-d_2)$</td>
+                                    <td class="note-cell">Expected PV receive</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">COST-P</td>
+                                    <td class="desc-cell">Put cost</td>
+                                    <td class="math-cell">$S_0e^{-\\delta T}N(-d_1)$</td>
+                                    <td class="note-cell">Expected PV give up</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">REPL-PORT</td>
+                                    <td class="desc-cell">Replication</td>
+                                    <td class="math-cell">$V = \\Delta S + B$</td>
+                                    <td class="note-cell">$\\Delta$ shares, $B$ cash</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">SELF-FIN</td>
+                                    <td class="desc-cell">Self-financing</td>
+                                    <td class="math-cell">$dV = \\Delta dS + rBdt$</td>
+                                    <td class="note-cell">No external funds</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">COMPL-MKT</td>
+                                    <td class="desc-cell">Complete market</td>
+                                    <td class="math-cell">Any payoff replicable</td>
+                                    <td class="note-cell">Unique price</td>
+                                </tr>
+                            </table>
+
+                            
+
+                            <div class="section-title">BS for Discrete Dividends</div>
+                            <table>
+                                <tr>
+                                    <td class="formula-id">DISC-DIV-C</td>
+                                    <td class="desc-cell">Discrete div call</td>
+                                    <td class="math-cell">$C = BS(F_0^P(S),0;K,r;\\sigma,T)$</td>
+                                    <td class="note-cell">Use prepaid fwd</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">DISC-DIV-P</td>
+                                    <td class="desc-cell">Discrete div put</td>
+                                    <td class="math-cell">$P = BS(K,r;F_0^P(S),0;\\sigma,T)$</td>
+                                    <td class="note-cell">Use prepaid fwd</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">PREP-FWD-D</td>
+                                    <td class="desc-cell">Prepaid fwd</td>
+                                    <td class="math-cell">$F_0^P(S) = S_0 - \\sum_i D_i e^{-rt_i}$</td>
+                                    <td class="note-cell">PV of divs</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">DISC-D1</td>
+                                    <td class="desc-cell">d₁ discrete</td>
+                                    <td class="math-cell">$d_1 = \\frac{\\ln(F_0^P/K)+(r+\\sigma^2/2)T}{\\sigma\\sqrt{T}}$</td>
+                                    <td class="note-cell">Note $\\delta=0$</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">DISC-D2</td>
+                                    <td class="desc-cell">d₂ discrete</td>
+                                    <td class="math-cell">$d_2 = d_1 - \\sigma\\sqrt{T}$</td>
+                                    <td class="note-cell">Same relation</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">DISC-VOL</td>
+                                    <td class="desc-cell">Volatility</td>
+                                    <td class="math-cell">$\\sigma$ is vol of $F_t^P(S)$</td>
+                                    <td class="note-cell">Not of $S_t$!</td>
+                                </tr>
+                            </table>
+
+                            <div class="section-title">BS for Currency Options</div>
+                            <table>
+                                <tr>
+                                    <td class="formula-id">FX-CALL</td>
+                                    <td class="desc-cell">Currency call</td>
+                                    <td class="math-cell">$C = BS(X_0,r_f;K,r_d;\\sigma,T)$</td>
+                                    <td class="note-cell">$X_0$ spot rate</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">FX-PUT</td>
+                                    <td class="desc-cell">Currency put</td>
+                                    <td class="math-cell">$P = BS(K,r_d;X_0,r_f;\\sigma,T)$</td>
+                                    <td class="note-cell">Domestic/foreign</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">FX-D1</td>
+                                    <td class="desc-cell">FX d₁</td>
+                                    <td class="math-cell">$d_1 = \\frac{\\ln(X_0/K)+(r_d-r_f+\\sigma^2/2)T}{\\sigma\\sqrt{T}}$</td>
+                                    <td class="note-cell">Rate difference</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">FX-D2</td>
+                                    <td class="desc-cell">FX d₂</td>
+                                    <td class="math-cell">$d_2 = d_1 - \\sigma\\sqrt{T}$</td>
+                                    <td class="note-cell">Standard link</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">FX-INTERP</td>
+                                    <td class="desc-cell">FX interpretation</td>
+                                    <td class="math-cell">Foreign rate = dividend yield</td>
+                                    <td class="note-cell">$r_f$ like $\\delta$</td>
+                                </tr>
+                            </table>
+
+                            <div class="section-title">BS for Futures Options</div>
+                            <table>
+                                <tr>
+                                    <td class="formula-id">FUT-OPT-C</td>
+                                    <td class="desc-cell">Futures call</td>
+                                    <td class="math-cell">$C = e^{-rT}[F_0N(d_1) - KN(d_2)]$</td>
+                                    <td class="note-cell">Black's formula</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">FUT-OPT-P</td>
+                                    <td class="desc-cell">Futures put</td>
+                                    <td class="math-cell">$P = e^{-rT}[KN(-d_2) - F_0N(-d_1)]$</td>
+                                    <td class="note-cell">Black's formula</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">FUT-D1</td>
+                                    <td class="desc-cell">Futures d₁</td>
+                                    <td class="math-cell">$d_1 = \\frac{\\ln(F_0/K)+\\sigma^2T/2}{\\sigma\\sqrt{T}}$</td>
+                                    <td class="note-cell">$r=\\delta=0$ analog</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">FUT-D2</td>
+                                    <td class="desc-cell">Futures d₂</td>
+                                    <td class="math-cell">$d_2 = d_1 - \\sigma\\sqrt{T}$</td>
+                                    <td class="note-cell">Standard</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">FUT-BS-MAP</td>
+                                    <td class="desc-cell">Futures BS map</td>
+                                    <td class="math-cell">$C = e^{-rT}BS(F_0,0;K,0;\\sigma,T)$</td>
+                                    <td class="note-cell">Both yields 0</td>
+                                </tr>
+                            </table>
+
+                            <div class="section-title">BS Special Cases & Notes</div>
+                            <table>
+                                <tr>
+                                    <td class="formula-id">NO-DIV-C</td>
+                                    <td class="desc-cell">No div call</td>
+                                    <td class="math-cell">Set $\\delta=0$ in BS-CALL-FULL</td>
+                                    <td class="note-cell">$C = S_0N(d_1) - Ke^{-rT}N(d_2)$</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">NO-DIV-P</td>
+                                    <td class="desc-cell">No div put</td>
+                                    <td class="math-cell">Set $\\delta=0$ in BS-PUT-FULL</td>
+                                    <td class="note-cell">$P = Ke^{-rT}N(-d_2) - S_0N(-d_1)$</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">ATM-APPR</td>
+                                    <td class="desc-cell">ATM approx</td>
+                                    <td class="math-cell">$C \\approx 0.4S_0\\sigma\\sqrt{T}$ when $S_0 \\approx K$</td>
+                                    <td class="note-cell">Quick estimate</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">BS-DERIV</td>
+                                    <td class="desc-cell">Derivation methods</td>
+                                    <td class="math-cell">RN pricing, replication, PDE, Esscher, CAPM, binomial limit</td>
+                                    <td class="note-cell">6 methods</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">BS-SCOPE</td>
+                                    <td class="desc-cell">Scope</td>
+                                    <td class="math-cell">European options only</td>
+                                    <td class="note-cell">Not American</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">BS-INPUTS</td>
+                                    <td class="desc-cell">Required inputs</td>
+                                    <td class="math-cell">$S_0, K, r, \\delta, \\sigma, T$</td>
+                                    <td class="note-cell">6 parameters</td>
+                                </tr>
+                                <tr>
+                                    <td class="formula-id">VOL-SOURCE</td>
+                                    <td class="desc-cell">Volatility</td>
+                                    <td class="math-cell">Historical or implied</td>
+                                    <td class="note-cell">Key input</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        document.addEventListener('DOMContentLoaded', renderPage);
+        if (document.readyState === 'complete' || document.readyState === 'interactive') {
+            if (!window.MathJax) renderPage();
+        }
+    </script>
+</body>
+</html>
